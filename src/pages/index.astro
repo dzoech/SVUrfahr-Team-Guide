@@ -1,6 +1,6 @@
 ---
 import SiteHeader from '../components/SiteHeader.astro';
-import { SITE } from '../config';
+import { pagePath, SITE } from '../config';
 import { getUpcomingEvents } from '../lib/calendar';
 import BaseLayout from '../layouts/BaseLayout.astro';
 
@@ -30,7 +30,7 @@ const timeFormatter = new Intl.DateTimeFormat('de-AT', {
 		</header>
 
 		<nav class="desk-menu" aria-label="Bereiche der Mannschaftsmappe">
-			<a class="menu-card calendar-card" href="/termine" style="--order: 0">
+			<a class="menu-card calendar-card" href={pagePath('termine')} style="--order: 0">
 				<span class="card-label">Nächster Termin</span>
 				{nextEvent ? (
 					<>
@@ -46,31 +46,31 @@ const timeFormatter = new Intl.DateTimeFormat('de-AT', {
 				<span class="card-action">Alle Termine <span aria-hidden="true">→</span></span>
 			</a>
 
-			<a class="menu-card folder-card parents" href="/aufgaben-eltern" style="--order: 1">
+			<a class="menu-card folder-card parents" href={pagePath('aufgaben-eltern')} style="--order: 1">
 				<span class="object-mark" aria-hidden="true">E</span>
 				<span class="card-title">Aufgaben der Eltern</span>
 				<span class="card-action">Nachlesen →</span>
 			</a>
 
-			<a class="menu-card folder-card children" href="/aufgaben-kinder" style="--order: 2">
+			<a class="menu-card folder-card children" href={pagePath('aufgaben-kinder')} style="--order: 2">
 				<span class="object-mark" aria-hidden="true">K</span>
 				<span class="card-title">Aufgaben der Kinder</span>
 				<span class="card-action">Nachlesen →</span>
 			</a>
 
-			<a class="menu-card index-card" href="/faq" style="--order: 3">
+			<a class="menu-card index-card" href={pagePath('faq')} style="--order: 3">
 				<span class="object-mark" aria-hidden="true">?</span>
 				<span class="card-title">Häufige Fragen</span>
 				<span class="card-action">Antworten →</span>
 			</a>
 
-			<a class="menu-card note-card" href="/kontakt" style="--order: 4">
+			<a class="menu-card note-card" href={pagePath('kontakt')} style="--order: 4">
 				<span class="object-mark" aria-hidden="true">i</span>
 				<span class="card-title">Kontakt</span>
 				<span class="card-action">Öffnen →</span>
 			</a>
 
-			<a class="new-team-link" href="/neu-im-team" style="--order: 5">
+			<a class="new-team-link" href={pagePath('neu-im-team')} style="--order: 5">
 				<span>
 					<strong>Neu im Team?</strong>
 					<small>Hier geht es zur einmaligen Start-Checkliste.</small>

@@ -1,7 +1,7 @@
 ---
 import BaseLayout from './BaseLayout.astro';
 import SiteHeader from '../components/SiteHeader.astro';
-import { SITE } from '../config';
+import { pagePath, SITE } from '../config';
 
 interface Props {
 	title: string;
@@ -31,7 +31,7 @@ const {
 			<slot />
 		</div>
 
-		<a class="back-link" href="/">
+		<a class="back-link" href={pagePath()}>
 			<span aria-hidden="true">←</span>
 			Zurück zur Übersicht
 		</a>

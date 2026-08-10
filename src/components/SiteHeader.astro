@@ -1,9 +1,9 @@
 ---
-import { SITE } from '../config';
+import { pagePath, SITE } from '../config';
 ---
 
 <header class="site-header" transition:persist="site-header">
-	<a class="brand" href="/" aria-label={`${SITE.team} – Startseite`}>
+	<a class="brand" href={pagePath()} aria-label={`${SITE.team} – Startseite`}>
 		<span class="crest" aria-hidden="true">
 			<span>SVU</span>
 			<small>1912</small>
@@ -13,7 +13,7 @@ import { SITE } from '../config';
 			<small>{SITE.title}</small>
 		</span>
 	</a>
-	<a class="home-link" href="/">
+	<a class="home-link" href={pagePath()}>
 		<span aria-hidden="true">⌂</span>
 		<span>Start</span>
 	</a>
