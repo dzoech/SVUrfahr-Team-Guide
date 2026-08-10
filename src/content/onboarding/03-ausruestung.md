@@ -1,6 +1,6 @@
 ---
 title: Grundausrüstung besorgen
-order: 3
+order: 4
 ---
 
 Fußballschuhe, Schienbeinschoner, Trinkflasche und wettergerechte Trainingskleidung vorbereiten.

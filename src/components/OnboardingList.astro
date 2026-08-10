@@ -28,14 +28,15 @@ const items = await Promise.all(
 	<ul class="checklist">
 		{items.map(({ entry, Content }) => (
 			<li>
-				<label>
+				<label class="check-control">
 					<input type="checkbox" data-onboarding-item={entry.id} />
 					<span class="checkmark" aria-hidden="true"></span>
-					<span class="copy">
-						<strong>{entry.data.title}</strong>
-						<Content />
-					</span>
+					<span class="sr-only">{entry.data.title} als erledigt markieren</span>
 				</label>
+				<div class="copy">
+					<strong>{entry.data.title}</strong>
+					<Content />
+				</div>
 			</li>
 		))}
 	</ul>
@@ -208,13 +209,21 @@ const items = await Promise.all(
 		list-style: none;
 	}
 
-	label {
+	.checklist li {
 		display: grid;
 		grid-template-columns: 1.7rem minmax(0, 1fr);
 		gap: 0.7rem;
 		min-height: 3.25rem;
 		padding: 0.7rem 0;
 		border-bottom: 1px dashed #cfc5b1;
+	}
+
+	.check-control {
+		display: grid;
+		width: 2.75rem;
+		height: 2.75rem;
+		margin: -0.5rem 0 0 -0.5rem;
+		place-items: center;
 		cursor: pointer;
 	}
 
@@ -252,11 +261,11 @@ const items = await Promise.all(
 		font-weight: 900;
 	}
 
-	input:checked ~ .copy {
+	.checklist li:has(input:checked) .copy {
 		color: var(--muted);
 	}
 
-	input:checked ~ .copy strong {
+	.checklist li:has(input:checked) .copy > strong {
 		text-decoration: line-through;
 		text-decoration-thickness: 0.12em;
 	}
@@ -277,6 +286,41 @@ const items = await Promise.all(
 		color: var(--muted);
 		font-size: 0.9rem;
 		line-height: 1.45;
+	}
+
+	.copy :global(ul) {
+		padding-left: 1.2rem;
+		margin: 0.45rem 0;
+		color: var(--muted);
+		font-size: 0.9rem;
+		line-height: 1.45;
+	}
+
+	.copy :global(a) {
+		font-weight: 750;
+	}
+
+	.copy :global(.starter-pack-images) {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 0.45rem;
+		margin: 0.65rem 0;
+	}
+
+	.copy :global(.starter-pack-images a) {
+		display: block;
+		border: 1px solid #ddd2c0;
+		border-radius: 0.45rem;
+		background: white;
+		overflow: hidden;
+	}
+
+	.copy :global(.starter-pack-images img) {
+		display: block;
+		width: 100%;
+		height: auto;
+		aspect-ratio: 1;
+		object-fit: cover;
 	}
 
 	.reset {
