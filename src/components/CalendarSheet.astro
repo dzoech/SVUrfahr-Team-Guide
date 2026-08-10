@@ -1,0 +1,220 @@
+---
+import {
+	CALENDAR_SUBSCRIPTION_URL,
+	getUpcomingEvents,
+	type CalendarEvent,
+} from '../lib/calendar';
+
+const events = await getUpcomingEvents();
+const timeZone = 'Europe/Vienna';
+
+const dateFormatter = new Intl.DateTimeFormat('de-AT', {
+	weekday: 'short',
+	day: '2-digit',
+	month: 'short',
+	timeZone,
+});
+const timeFormatter = new Intl.DateTimeFormat('de-AT', {
+	hour: '2-digit',
+	minute: '2-digit',
+	timeZone,
+});
+
+function mapUrl(event: CalendarEvent): string {
+	return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.location)}`;
+}
+---
+
+<section class="calendar-sheet">
+	<div class="binding" aria-hidden="true">
+		{Array.from({ length: 7 }, (_, index) => <span style={`--index: ${index}`}></span>)}
+	</div>
+
+	<div class="heading">
+		<div>
+			<p class="eyebrow">Mannschaftskalender</p>
+			<h2>Nächste Termine</h2>
+		</div>
+		<a class="subscribe" href={CALENDAR_SUBSCRIPTION_URL}>Abonnieren</a>
+	</div>
+
+	{events.length > 0 ? (
+		<ol class="events">
+			{events.map((event) => (
+				<li>
+					<time datetime={event.start.toISOString()}>
+						<span>{dateFormatter.format(event.start)}</span>
+						<strong class:list={{ 'all-day': event.allDay }}>
+							{event.allDay ? 'Ganztägig' : timeFormatter.format(event.start)}
+						</strong>
+					</time>
+					<div class="event-copy">
+						<h3>{event.title}</h3>
+						{event.description && <p>{event.description}</p>}
+						{event.location && (
+							<a href={mapUrl(event)} target="_blank" rel="noreferrer">
+								{event.location}
+								<span class="sr-only"> in Google Maps öffnen</span>
+							</a>
+						)}
+					</div>
+				</li>
+			))}
+		</ol>
+	) : (
+		<p class="empty">Aktuell sind keine zukünftigen Termine eingetragen.</p>
+	)}
+
+	<p class="source">Automatisch aus dem offiziellen Kalender aktualisiert.</p>
+</section>
+
+<style>
+	.calendar-sheet {
+		position: relative;
+		width: 100%;
+		min-width: 0;
+		padding: 3.2rem 1.15rem 1.1rem;
+		background:
+			linear-gradient(90deg, transparent 3.4rem, #f3b5af 3.45rem, transparent 3.52rem),
+			linear-gradient(#d9e4ed 1px, transparent 1px),
+			#fffef9;
+		background-size: 100% 100%, 100% 1.75rem, 100% 100%;
+		border-radius: 0.3rem 0.3rem 0.7rem 0.7rem;
+		box-shadow: var(--shadow);
+		transform: rotate(0.25deg);
+	}
+
+	.binding {
+		position: absolute;
+		top: 0.65rem;
+		left: 1.2rem;
+		right: 1.2rem;
+		display: flex;
+		justify-content: space-around;
+	}
+
+	.binding span {
+		width: 0.8rem;
+		height: 0.8rem;
+		border-radius: 50%;
+		background: #79502d;
+		box-shadow:
+			inset 0 2px 3px rgb(0 0 0 / 45%),
+			0 -0.75rem 0 -0.22rem #393834;
+	}
+
+	.heading {
+		display: flex;
+		min-width: 0;
+		align-items: end;
+		justify-content: space-between;
+		gap: 0.75rem;
+		margin-bottom: 0.8rem;
+		padding-bottom: 0.75rem;
+		border-bottom: 3px solid #d1493f;
+	}
+
+	.eyebrow {
+		margin: 0 0 0.2rem;
+		color: #a7352e;
+		font-size: 0.72rem;
+		font-weight: 800;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+	}
+
+	h2 {
+		margin: 0;
+		font-family: ui-rounded, "Arial Rounded MT Bold", sans-serif;
+		font-size: clamp(1.55rem, 7.5vw, 2rem);
+		line-height: 1.05;
+	}
+
+	.subscribe {
+		display: grid;
+		flex: 0 0 auto;
+		min-height: 2.75rem;
+		padding: 0.55rem 0.7rem;
+		place-items: center;
+		border: 2px solid #a7352e;
+		border-radius: 0.5rem;
+		color: #8d2a25;
+		font-size: 0.8rem;
+		font-weight: 800;
+		text-decoration: none;
+	}
+
+	.events {
+		padding: 0;
+		margin: 0;
+		list-style: none;
+	}
+
+	.events li {
+		display: grid;
+		grid-template-columns: 4rem minmax(0, 1fr);
+		gap: 0.85rem;
+		padding: 0.9rem 0;
+		border-bottom: 1px dashed #b8b5aa;
+	}
+
+	time {
+		display: grid;
+		align-content: start;
+		color: #8d2a25;
+		text-align: center;
+		text-transform: uppercase;
+	}
+
+	time span {
+		font-size: 0.7rem;
+		font-weight: 800;
+		letter-spacing: 0.03em;
+	}
+
+	time strong {
+		font-size: 1.08rem;
+	}
+
+	time strong.all-day {
+		font-size: 0.72rem;
+	}
+
+	.event-copy h3 {
+		margin: 0;
+		font-size: 1rem;
+		line-height: 1.3;
+	}
+
+	.event-copy {
+		min-width: 0;
+	}
+
+	.event-copy p {
+		margin: 0.25rem 0;
+		color: var(--muted);
+		font-size: 0.82rem;
+		line-height: 1.35;
+	}
+
+	.event-copy a {
+		display: inline-block;
+		max-width: 100%;
+		margin-top: 0.3rem;
+		font-size: 0.78rem;
+		line-height: 1.35;
+		overflow-wrap: anywhere;
+	}
+
+	.empty {
+		margin: 1rem 0;
+		line-height: 1.5;
+	}
+
+	.source {
+		margin: 1rem 0 0;
+		color: var(--muted);
+		font-size: 0.72rem;
+		text-align: center;
+	}
+</style>

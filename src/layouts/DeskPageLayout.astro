@@ -1,0 +1,152 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+import { SITE } from '../config';
+
+interface Props {
+	title: string;
+	eyebrow: string;
+	intro: string;
+	entrance?: 'left' | 'right' | 'bottom';
+}
+
+const {
+	title,
+	eyebrow,
+	intro,
+	entrance = 'right',
+} = Astro.props;
+---
+
+<BaseLayout title={`${title} – ${SITE.team}`} description={intro}>
+	<SiteHeader />
+	<main class="subpage" transition:animate="slide">
+		<header class="page-heading">
+			<p>{eyebrow}</p>
+			<h1>{title}</h1>
+			<div>{intro}</div>
+		</header>
+
+		<div class:list={['object-stage', `from-${entrance}`]}>
+			<slot />
+		</div>
+
+		<a class="back-link" href="/">
+			<span aria-hidden="true">←</span>
+			Zurück zur Übersicht
+		</a>
+	</main>
+</BaseLayout>
+
+<style>
+	.subpage {
+		display: grid;
+		width: min(100%, 30rem);
+		min-height: calc(100svh - 4.35rem);
+		gap: 1.35rem;
+		padding:
+			1.2rem
+			max(0.85rem, env(safe-area-inset-right))
+			max(2rem, env(safe-area-inset-bottom))
+			max(0.85rem, env(safe-area-inset-left));
+		margin-inline: auto;
+		overflow-x: clip;
+	}
+
+	.page-heading {
+		position: relative;
+		padding: 1.15rem 1.15rem 1.25rem;
+		border: 1px solid rgb(255 255 255 / 12%);
+		border-left: 0.35rem solid var(--accent);
+		color: white;
+		background: rgb(15 15 15 / 88%);
+		box-shadow: var(--shadow);
+	}
+
+	.page-heading p {
+		margin: 0 0 0.25rem;
+		color: #ff7478;
+		font-size: 0.72rem;
+		font-weight: 900;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+	}
+
+	.page-heading h1 {
+		margin: 0;
+		font-family: ui-rounded, "Arial Rounded MT Bold", sans-serif;
+		font-size: clamp(1.8rem, 9vw, 2.5rem);
+		line-height: 1.02;
+		letter-spacing: -0.035em;
+	}
+
+	.page-heading div {
+		margin-top: 0.55rem;
+		color: rgb(255 255 255 / 72%);
+		font-size: 0.92rem;
+		line-height: 1.45;
+	}
+
+	.object-stage {
+		min-width: 0;
+		animation: put-from-right 480ms cubic-bezier(0.2, 0.8, 0.25, 1) both;
+	}
+
+	.object-stage.from-left {
+		animation-name: put-from-left;
+	}
+
+	.object-stage.from-bottom {
+		animation-name: put-from-bottom;
+	}
+
+	.back-link {
+		display: flex;
+		width: 100%;
+		min-height: 3.25rem;
+		padding: 0.7rem 1rem;
+		align-items: center;
+		justify-content: center;
+		gap: 0.45rem;
+		border: 1px solid rgb(255 255 255 / 25%);
+		border-radius: 0.65rem;
+		color: white;
+		background: rgb(15 15 15 / 64%);
+		font-size: 0.9rem;
+		font-weight: 800;
+		text-decoration: none;
+	}
+
+	@keyframes put-from-right {
+		from {
+			opacity: 0;
+			transform: translateX(80%) rotate(5deg) scale(0.94);
+		}
+		to {
+			opacity: 1;
+			transform: translateX(0) rotate(0) scale(1);
+		}
+	}
+
+	@keyframes put-from-left {
+		from {
+			opacity: 0;
+			transform: translateX(-80%) rotate(-5deg) scale(0.94);
+		}
+		to {
+			opacity: 1;
+			transform: translateX(0) rotate(0) scale(1);
+		}
+	}
+
+	@keyframes put-from-bottom {
+		from {
+			opacity: 0;
+			transform: translateY(35vh) rotate(2deg) scale(0.94);
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0) rotate(0) scale(1);
+		}
+	}
+</style>

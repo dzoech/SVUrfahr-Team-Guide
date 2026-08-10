@@ -1,0 +1,117 @@
+---
+import { getCollection, render } from 'astro:content';
+
+interface Props {
+	audience: 'parents' | 'children';
+}
+
+const { audience } = Astro.props;
+const entries =
+	audience === 'parents'
+		? await getCollection('parents')
+		: await getCollection('children');
+const items = await Promise.all(
+	entries
+		.sort((left, right) => left.data.order - right.data.order)
+		.map(async (entry) => ({
+			entry,
+			Content: (await render(entry)).Content,
+		})),
+);
+---
+
+<section class:list={['task-sheet', audience]}>
+	<div class="folder-tab" aria-hidden="true">
+		{audience === 'parents' ? 'ELTERN' : 'KINDER'}
+	</div>
+	<ol>
+		{items.map(({ entry, Content }, index) => (
+			<li>
+				<span class="number" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
+				<div class="copy">
+					<h2>{entry.data.title}</h2>
+					<Content />
+				</div>
+			</li>
+		))}
+	</ol>
+</section>
+
+<style>
+	.task-sheet {
+		position: relative;
+		padding: 2.4rem 1rem 1rem;
+		border-top: 0.65rem solid var(--black);
+		border-radius: 0.35rem;
+		background:
+			linear-gradient(rgb(30 30 30 / 6%) 1px, transparent 1px),
+			var(--paper);
+		background-size: 100% 1.7rem;
+		box-shadow: var(--shadow);
+	}
+
+	.folder-tab {
+		position: absolute;
+		top: -2rem;
+		left: 1rem;
+		min-width: 6.8rem;
+		padding: 0.48rem 0.8rem 0.55rem;
+		border-radius: 0.45rem 0.45rem 0 0;
+		color: white;
+		background: var(--accent);
+		font-size: 0.7rem;
+		font-weight: 950;
+		letter-spacing: 0.11em;
+		text-align: center;
+	}
+
+	ol {
+		display: grid;
+		gap: 0.45rem;
+		padding: 0;
+		margin: 0;
+		list-style: none;
+	}
+
+	li {
+		display: grid;
+		grid-template-columns: 2.2rem minmax(0, 1fr);
+		gap: 0.7rem;
+		padding: 0.85rem 0;
+		border-bottom: 1px dashed #c9beaa;
+	}
+
+	li:last-child {
+		border-bottom: 0;
+	}
+
+	.number {
+		display: grid;
+		width: 2rem;
+		height: 2rem;
+		place-items: center;
+		border-radius: 50%;
+		color: white;
+		background: var(--black);
+		font-size: 0.72rem;
+		font-weight: 900;
+	}
+
+	h2 {
+		margin: 0;
+		font-size: 1rem;
+		line-height: 1.3;
+	}
+
+	.copy {
+		min-width: 0;
+	}
+
+	.copy :global(p) {
+		margin: 0.3rem 0 0;
+		color: var(--muted);
+		font-size: 0.9rem;
+		line-height: 1.48;
+		overflow-wrap: anywhere;
+	}
+</style>

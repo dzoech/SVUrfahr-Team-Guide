@@ -1,0 +1,153 @@
+---
+import { getCollection, render } from 'astro:content';
+
+const entries = (await getCollection('faq')).sort(
+	(left, right) => left.data.order - right.data.order,
+);
+const questions = await Promise.all(
+	entries.map(async (entry) => ({
+		entry,
+		Content: (await render(entry)).Content,
+	})),
+);
+---
+
+<section class="card-stack">
+	<div class="index-tab" aria-hidden="true">FAQ</div>
+	<p class="eyebrow">Kurz nachgeschlagen</p>
+	<h2>Häufige Fragen</h2>
+
+	<div class="questions">
+		{questions.map(({ entry, Content }) => (
+			<details>
+				<summary>
+					<span>{entry.data.question}</span>
+					<span class="plus" aria-hidden="true"></span>
+				</summary>
+				<div class="answer">
+					<Content />
+				</div>
+			</details>
+		))}
+	</div>
+</section>
+
+<style>
+	.card-stack {
+		position: relative;
+		width: 100%;
+		min-width: 0;
+		padding: 1.35rem 1.1rem 1.25rem;
+		background:
+			linear-gradient(rgb(50 113 149 / 10%) 1px, transparent 1px),
+			#fff9dc;
+		background-size: 100% 1.7rem;
+		border: 1px solid #dfd4ac;
+		border-radius: 0.25rem;
+		box-shadow:
+			0.35rem 0.35rem 0 #e9dfbd,
+			0.7rem 0.7rem 0 #d8cda8,
+			var(--shadow);
+		transform: rotate(-0.2deg);
+	}
+
+	.index-tab {
+		position: absolute;
+		top: -1.5rem;
+		right: 1rem;
+		padding: 0.45rem 1rem 0.5rem;
+		border-radius: 0.45rem 0.45rem 0 0;
+		color: #fff;
+		background: var(--accent);
+		font-size: 0.75rem;
+		font-weight: 900;
+		letter-spacing: 0.08em;
+	}
+
+	.eyebrow {
+		margin: 0 0 0.2rem;
+		color: var(--accent-dark);
+		font-size: 0.72rem;
+		font-weight: 800;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+	}
+
+	h2 {
+		margin: 0 0 0.9rem;
+		font-family: ui-rounded, "Arial Rounded MT Bold", sans-serif;
+		font-size: clamp(1.55rem, 7.5vw, 2rem);
+	}
+
+	.questions {
+		display: grid;
+		gap: 0.55rem;
+	}
+
+	details {
+		border: 1px solid #d6c99e;
+		border-radius: 0.55rem;
+		background: rgb(255 254 246 / 88%);
+		overflow: clip;
+	}
+
+	summary {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) 1.35rem;
+		gap: 0.75rem;
+		min-height: 3.5rem;
+		padding: 0.9rem;
+		align-items: center;
+		font-weight: 800;
+		line-height: 1.3;
+		cursor: pointer;
+		list-style: none;
+	}
+
+	summary::-webkit-details-marker {
+		display: none;
+	}
+
+	.plus {
+		position: relative;
+		width: 1.15rem;
+		height: 1.15rem;
+	}
+
+	.plus::before,
+	.plus::after {
+		content: "";
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		width: 1rem;
+		height: 2px;
+		background: var(--accent);
+		transform: translate(-50%, -50%);
+		transition: transform 160ms ease;
+	}
+
+	.plus::after {
+		transform: translate(-50%, -50%) rotate(90deg);
+	}
+
+	details[open] .plus::after {
+		transform: translate(-50%, -50%) rotate(0);
+	}
+
+	.answer {
+		padding: 0 0.9rem 1rem;
+		color: var(--muted);
+		font-size: 0.92rem;
+		line-height: 1.5;
+	}
+
+	.answer :global(p) {
+		margin: 0;
+	}
+
+	.answer :global(ul) {
+		padding-left: 1.2rem;
+		margin: 0;
+	}
+</style>

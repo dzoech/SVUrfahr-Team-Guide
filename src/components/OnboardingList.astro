@@ -1,0 +1,296 @@
+---
+import { getCollection, render } from 'astro:content';
+
+const entries = (await getCollection('onboarding')).sort(
+	(left, right) => left.data.order - right.data.order,
+);
+const items = await Promise.all(
+	entries.map(async (entry) => ({
+		entry,
+		Content: (await render(entry)).Content,
+	})),
+);
+---
+
+<section class="clipboard" data-onboarding-root>
+	<div class="clip" aria-hidden="true"></div>
+	<p class="eyebrow">Neu im Team?</p>
+	<h2>Deine ersten Schritte</h2>
+	<p class="intro">Hake ab, was bereits erledigt ist. Der Stand bleibt auf diesem Gerät gespeichert.</p>
+
+	<div class="progress-row" aria-live="polite">
+		<progress value="0" max={items.length} data-onboarding-progress>
+			0 von {items.length} erledigt
+		</progress>
+		<span data-onboarding-progress-label>0 von {items.length} erledigt</span>
+	</div>
+
+	<ul class="checklist">
+		{items.map(({ entry, Content }) => (
+			<li>
+				<label>
+					<input type="checkbox" data-onboarding-item={entry.id} />
+					<span class="checkmark" aria-hidden="true"></span>
+					<span class="copy">
+						<strong>{entry.data.title}</strong>
+						<Content />
+					</span>
+				</label>
+			</li>
+		))}
+	</ul>
+
+	<button class="reset" type="button" data-onboarding-reset>Fortschritt zurücksetzen</button>
+</section>
+
+<script>
+	const storageKey = 'mannschaftsmappe:onboarding';
+
+	const initializeOnboarding = () => {
+		const root = document.querySelector<HTMLElement>('[data-onboarding-root]');
+		if (!root || root.dataset.initialized === 'true') {
+			return;
+		}
+		root.dataset.initialized = 'true';
+
+		const checkboxes = Array.from(
+			root.querySelectorAll<HTMLInputElement>('[data-onboarding-item]'),
+		);
+		const progress = root.querySelector<HTMLProgressElement>('[data-onboarding-progress]');
+		const progressLabel = root.querySelector<HTMLElement>('[data-onboarding-progress-label]');
+		const resetButton = root.querySelector<HTMLButtonElement>('[data-onboarding-reset]');
+
+		const updateProgress = () => {
+			const completed = checkboxes.filter((checkbox) => checkbox.checked).length;
+			const label = `${completed} von ${checkboxes.length} erledigt`;
+
+			if (progress) {
+				progress.value = completed;
+				progress.textContent = label;
+			}
+			if (progressLabel) {
+				progressLabel.textContent = label;
+			}
+		};
+
+		const saveProgress = () => {
+			const completed = checkboxes
+				.filter((checkbox) => checkbox.checked)
+				.map((checkbox) => checkbox.dataset.onboardingItem)
+				.filter((id): id is string => Boolean(id));
+
+			try {
+				localStorage.setItem(storageKey, JSON.stringify(completed));
+			} catch (error) {
+				console.error('Der Onboarding-Fortschritt konnte nicht gespeichert werden.', error);
+			}
+		};
+
+		try {
+			const stored = localStorage.getItem(storageKey);
+			const completed: unknown = stored ? JSON.parse(stored) : [];
+			if (!Array.isArray(completed) || !completed.every((id) => typeof id === 'string')) {
+				throw new Error('Gespeicherter Onboarding-Fortschritt ist ungültig.');
+			}
+			const completedIds = new Set(completed);
+			checkboxes.forEach((checkbox) => {
+				checkbox.checked = completedIds.has(checkbox.dataset.onboardingItem ?? '');
+			});
+		} catch (error) {
+			console.error('Der Onboarding-Fortschritt konnte nicht geladen werden.', error);
+		}
+
+		checkboxes.forEach((checkbox) => {
+			checkbox.addEventListener('change', () => {
+				saveProgress();
+				updateProgress();
+			});
+		});
+
+		resetButton?.addEventListener('click', () => {
+			checkboxes.forEach((checkbox) => {
+				checkbox.checked = false;
+			});
+			try {
+				localStorage.removeItem(storageKey);
+			} catch (error) {
+				console.error('Der Onboarding-Fortschritt konnte nicht gelöscht werden.', error);
+			}
+			updateProgress();
+		});
+
+		updateProgress();
+	};
+
+	document.addEventListener('astro:page-load', initializeOnboarding);
+	initializeOnboarding();
+</script>
+
+<style>
+	.clipboard {
+		position: relative;
+		width: 100%;
+		min-width: 0;
+		padding: 3.4rem 1.25rem 1.35rem;
+		background:
+			linear-gradient(rgb(44 38 30 / 3%) 1px, transparent 1px),
+			var(--paper);
+		background-size: 100% 1.75rem;
+		border: 0.65rem solid #8b151a;
+		border-radius: 0.65rem;
+		box-shadow: var(--shadow);
+	}
+
+	.clip {
+		position: absolute;
+		top: -0.7rem;
+		left: 50%;
+		width: 8rem;
+		height: 3.2rem;
+		transform: translateX(-50%);
+		border: 2px solid #62605c;
+		border-radius: 0.6rem 0.6rem 0.35rem 0.35rem;
+		background: linear-gradient(100deg, #a8a6a0, #deddd7 48%, #92908a);
+		box-shadow: 0 3px 5px rgb(0 0 0 / 25%);
+	}
+
+	.clip::after {
+		content: "";
+		position: absolute;
+		inset: 0.65rem 2.1rem auto;
+		height: 0.7rem;
+		border-radius: 1rem;
+		background: #6f6d68;
+	}
+
+	.eyebrow {
+		margin: 0 0 0.25rem;
+		color: var(--accent);
+		font-size: 0.78rem;
+		font-weight: 800;
+		letter-spacing: 0.09em;
+		text-transform: uppercase;
+	}
+
+	h2 {
+		margin: 0;
+		font-family: ui-rounded, "Arial Rounded MT Bold", sans-serif;
+		font-size: clamp(1.65rem, 8vw, 2.1rem);
+		line-height: 1.08;
+	}
+
+	.intro {
+		margin: 0.65rem 0 1rem;
+		color: var(--muted);
+		line-height: 1.5;
+	}
+
+	.progress-row {
+		display: grid;
+		gap: 0.35rem;
+		margin-bottom: 1rem;
+		color: var(--muted);
+		font-size: 0.82rem;
+		font-weight: 700;
+	}
+
+	progress {
+		width: 100%;
+		height: 0.7rem;
+		accent-color: var(--accent);
+	}
+
+	.checklist {
+		display: grid;
+		gap: 0.2rem;
+		padding: 0;
+		margin: 0;
+		list-style: none;
+	}
+
+	label {
+		display: grid;
+		grid-template-columns: 1.7rem minmax(0, 1fr);
+		gap: 0.7rem;
+		min-height: 3.25rem;
+		padding: 0.7rem 0;
+		border-bottom: 1px dashed #cfc5b1;
+		cursor: pointer;
+	}
+
+	input {
+		position: absolute;
+		opacity: 0;
+		pointer-events: none;
+	}
+
+	.checkmark {
+		display: grid;
+		width: 1.55rem;
+		height: 1.55rem;
+		margin-top: 0.1rem;
+		place-items: center;
+		border: 2px solid #837b70;
+		border-radius: 0.3rem;
+		background: #fff;
+	}
+
+	input:focus-visible + .checkmark {
+		outline: 3px solid #ffbd22;
+		outline-offset: 3px;
+	}
+
+	input:checked + .checkmark {
+		border-color: var(--accent);
+		background: var(--accent);
+	}
+
+	input:checked + .checkmark::after {
+		content: "✓";
+		color: white;
+		font-size: 1rem;
+		font-weight: 900;
+	}
+
+	input:checked ~ .copy {
+		color: var(--muted);
+	}
+
+	input:checked ~ .copy strong {
+		text-decoration: line-through;
+		text-decoration-thickness: 0.12em;
+	}
+
+	.copy strong {
+		display: block;
+		font-size: 1rem;
+		line-height: 1.3;
+	}
+
+	.copy {
+		min-width: 0;
+		overflow-wrap: anywhere;
+	}
+
+	.copy :global(p) {
+		margin: 0.25rem 0 0;
+		color: var(--muted);
+		font-size: 0.9rem;
+		line-height: 1.45;
+	}
+
+	.reset {
+		width: 100%;
+		min-height: 2.75rem;
+		margin-top: 1rem;
+		border: 0;
+		border-radius: 0.5rem;
+		color: var(--muted);
+		background: transparent;
+		font-size: 0.85rem;
+		font-weight: 700;
+		text-decoration: underline;
+		text-underline-offset: 0.2em;
+		cursor: pointer;
+	}
+</style>

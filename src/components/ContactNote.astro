@@ -1,0 +1,71 @@
+---
+import { getCollection, render } from 'astro:content';
+
+const entries = (await getCollection('info')).sort(
+	(left, right) => left.data.order - right.data.order,
+);
+const notes = await Promise.all(
+	entries.map(async (entry) => ({
+		entry,
+		Content: (await render(entry)).Content,
+	})),
+);
+---
+
+<section class="note">
+	<div class="tape" aria-hidden="true"></div>
+	{notes.map(({ entry, Content }) => (
+		<>
+			<h2>{entry.data.title}</h2>
+			<div class="copy"><Content /></div>
+		</>
+	))}
+</section>
+
+<style>
+	.note {
+		position: relative;
+		min-width: 0;
+		width: calc(100% - 1.5rem);
+		padding: 2.1rem 1.3rem 1.5rem;
+		margin-inline: auto;
+		background: #f5e6e7;
+		box-shadow: var(--shadow);
+		transform: rotate(1.2deg);
+	}
+
+	.note::after {
+		content: "";
+		position: absolute;
+		right: 0;
+		bottom: 0;
+		border-style: solid;
+		border-width: 0 0 1.15rem 1.15rem;
+		border-color: transparent transparent #d4b8ba transparent;
+	}
+
+	.tape {
+		position: absolute;
+		top: -0.75rem;
+		left: 50%;
+		width: 6.5rem;
+		height: 1.7rem;
+		background: rgb(235 224 195 / 78%);
+		box-shadow: 0 1px 2px rgb(0 0 0 / 12%);
+		transform: translateX(-50%) rotate(-2deg);
+	}
+
+	h2 {
+		margin: 0 0 0.65rem;
+		font-family: ui-rounded, "Arial Rounded MT Bold", sans-serif;
+		font-size: 1.6rem;
+	}
+
+	.copy {
+		line-height: 1.55;
+	}
+
+	.copy :global(p) {
+		margin: 0.45rem 0;
+	}
+</style>
