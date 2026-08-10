@@ -1,5 +1,6 @@
 ---
 import { getCollection, render } from 'astro:content';
+import { pagePath } from '../config';
 
 interface Props {
 	audience: 'parents' | 'children';
@@ -21,26 +22,44 @@ const items = await Promise.all(
 ---
 
 <section class:list={['task-sheet', audience]}>
-	<div class="folder-tab" aria-hidden="true">
-		{audience === 'parents' ? 'ELTERN' : 'KINDER'}
+	<nav class="folder-tabs" aria-label="Aufgaben auswählen">
+		<a
+			class:list={['folder-tab', { active: audience === 'parents' }]}
+			href={pagePath('aufgaben-eltern')}
+			aria-current={audience === 'parents' ? 'page' : undefined}
+		>
+			Eltern
+		</a>
+		<a
+			class:list={['folder-tab', { active: audience === 'children' }]}
+			href={pagePath('aufgaben-kinder')}
+			aria-current={audience === 'children' ? 'page' : undefined}
+		>
+			Kinder
+		</a>
+	</nav>
+	<div class="folder-page">
+		<ol>
+			{items.map(({ entry, Content }, index) => (
+				<li>
+					<span class="number" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
+					<div class="copy">
+						<h2>{entry.data.title}</h2>
+						<Content />
+					</div>
+				</li>
+			))}
+		</ol>
 	</div>
-	<ol>
-		{items.map(({ entry, Content }, index) => (
-			<li>
-				<span class="number" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
-				<div class="copy">
-					<h2>{entry.data.title}</h2>
-					<Content />
-				</div>
-			</li>
-		))}
-	</ol>
 </section>
 
 <style>
 	.task-sheet {
-		position: relative;
-		padding: 2.4rem 1rem 1rem;
+		min-width: 0;
+	}
+
+	.folder-page {
+		padding: 1.4rem 1rem 1rem;
 		border-top: 0.65rem solid var(--black);
 		border-radius: 0.35rem;
 		background:
@@ -50,19 +69,45 @@ const items = await Promise.all(
 		box-shadow: var(--shadow);
 	}
 
+	.folder-tabs {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 0.35rem;
+		padding: 0 0.7rem;
+		align-items: end;
+	}
+
 	.folder-tab {
-		position: absolute;
-		top: -2rem;
-		left: 1rem;
-		min-width: 6.8rem;
-		padding: 0.48rem 0.8rem 0.55rem;
+		display: grid;
+		min-width: 0;
+		min-height: 2.75rem;
+		padding: 0.55rem 0.7rem;
+		place-items: center;
+		border: 2px solid #847c70;
+		border-bottom: 0;
 		border-radius: 0.45rem 0.45rem 0 0;
-		color: white;
-		background: var(--accent);
+		color: var(--black);
+		background: #cfc5b4;
 		font-size: 0.7rem;
 		font-weight: 950;
 		letter-spacing: 0.11em;
 		text-align: center;
+		text-decoration: none;
+		text-transform: uppercase;
+	}
+
+	.folder-tab.active {
+		border-color: #751015;
+		color: white;
+		background: var(--accent);
+		box-shadow: 0 -0.2rem 0.55rem rgb(0 0 0 / 18%);
+	}
+
+	.folder-tab:focus-visible {
+		position: relative;
+		z-index: 1;
+		outline: 3px solid #ffbd22;
+		outline-offset: 2px;
 	}
 
 	ol {
