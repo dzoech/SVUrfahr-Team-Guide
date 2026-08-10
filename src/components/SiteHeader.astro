@@ -1,13 +1,16 @@
 ---
-import { pagePath, SITE } from '../config';
+import { assetPath, pagePath, SITE } from '../config';
 ---
 
 <header class="site-header" transition:persist="site-header">
 	<a class="brand" href={pagePath()} aria-label={`${SITE.team} – Startseite`}>
-		<span class="crest" aria-hidden="true">
-			<span>SVU</span>
-			<small>1912</small>
-		</span>
+		<img
+			class="club-logo"
+			src={assetPath('sv-urfahr-logo.png')}
+			width="480"
+			height="609"
+			alt=""
+		/>
 		<span class="brand-copy">
 			<strong>{SITE.team}</strong>
 			<small>{SITE.title}</small>
@@ -52,33 +55,12 @@ import { pagePath, SITE } from '../config';
 		text-decoration: none;
 	}
 
-	.crest {
-		display: grid;
+	.club-logo {
+		display: block;
 		flex: 0 0 auto;
-		width: 2.55rem;
-		height: 2.8rem;
-		place-content: center;
-		border: 2px solid white;
-		border-radius: 0.35rem 0.35rem 0.9rem 0.9rem;
-		color: white;
-		background: var(--accent);
-		box-shadow: inset 0 0 0 2px var(--black);
-		text-align: center;
-		transform: skewY(-2deg);
-	}
-
-	.crest span {
-		font-size: 0.72rem;
-		font-weight: 950;
-		letter-spacing: -0.04em;
-		line-height: 1;
-	}
-
-	.crest small {
-		margin-top: 0.1rem;
-		font-size: 0.45rem;
-		font-weight: 800;
-		line-height: 1;
+		width: auto;
+		height: 3.15rem;
+		object-fit: contain;
 	}
 
 	.brand-copy {
