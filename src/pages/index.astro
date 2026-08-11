@@ -53,6 +53,10 @@ const timeFormatter = new Intl.DateTimeFormat('de-AT', {
 					<p><span>Montag</span><strong>17:00</strong></p>
 					<p><span>Donnerstag</span><strong>17:00</strong></p>
 				</div>
+				<p class="practice-rsvp">
+					<strong>Teilnahme & Absage:</strong> Rückmeldungen laufen über die WhatsApp-Events.
+					<a href={`${pagePath('faq')}#02-absage`}>Regeln ansehen →</a>
+				</p>
 				<div class="practice-bottom">
 					<div class="postit-wrap">
 						<span class="paper-clip" aria-hidden="true"></span>
@@ -79,19 +83,25 @@ const timeFormatter = new Intl.DateTimeFormat('de-AT', {
 				<span class="card-action">Nachlesen →</span>
 			</a>
 
-			<a class="menu-card index-card" href={pagePath('faq')} style="--order: 5">
+			<a class="menu-card formation-card" href={pagePath('aufstellung')} style="--order: 5">
+				<span class="object-mark formation-mark" aria-hidden="true">6+1</span>
+				<span class="card-title">Positionen am Feld</span>
+				<span class="card-action">Taktiktafel öffnen →</span>
+			</a>
+
+			<a class="menu-card index-card" href={pagePath('faq')} style="--order: 6">
 				<span class="object-mark" aria-hidden="true">?</span>
 				<span class="card-title">Häufige Fragen</span>
 				<span class="card-action">Antworten →</span>
 			</a>
 
-			<a class="menu-card note-card" href={pagePath('kontakt')} style="--order: 6">
+			<a class="menu-card note-card" href={pagePath('kontakt')} style="--order: 7">
 				<span class="object-mark" aria-hidden="true">i</span>
 				<span class="card-title">Kontakt</span>
 				<span class="card-action">Öffnen →</span>
 			</a>
 
-			<a class="new-team-link" href={pagePath('neu-im-team')} style="--order: 7">
+			<a class="new-team-link" href={pagePath('neu-im-team')} style="--order: 8">
 				<span>
 					<strong>Neu im Team?</strong>
 					<small>Hier geht es zur einmaligen Start-Checkliste.</small>
@@ -339,6 +349,26 @@ const timeFormatter = new Intl.DateTimeFormat('de-AT', {
 		line-height: 1.45;
 	}
 
+	.practice-rsvp {
+		padding: 0.6rem 0.7rem;
+		margin: 0;
+		border: 1px dashed #cfbfa5;
+		border-radius: 0.35rem;
+		color: var(--muted);
+		background: rgb(255 255 255 / 58%);
+		font-size: 0.79rem;
+		line-height: 1.4;
+	}
+
+	.practice-rsvp strong {
+		color: var(--ink);
+	}
+
+	.practice-rsvp a {
+		font-weight: 850;
+		white-space: nowrap;
+	}
+
 	.practice-bottom {
 		display: flow-root;
 	}
@@ -465,6 +495,40 @@ const timeFormatter = new Intl.DateTimeFormat('de-AT', {
 			#fff9dc;
 		background-size: 100% 1.45rem;
 		transform: rotate(-0.5deg);
+	}
+
+	.formation-card {
+		color: white;
+		background:
+			linear-gradient(90deg, transparent 49.6%, rgb(255 255 255 / 28%) 49.6% 50.4%, transparent 50.4%),
+			linear-gradient(#315f42, #234a32);
+		box-shadow:
+			inset 0 0 0 0.35rem rgb(255 255 255 / 18%),
+			var(--shadow);
+		transform: rotate(0.35deg);
+	}
+
+	.formation-card::after {
+		content: "";
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		width: 3.25rem;
+		height: 3.25rem;
+		border: 2px solid rgb(255 255 255 / 25%);
+		border-radius: 50%;
+		pointer-events: none;
+		transform: translate(-50%, -50%);
+	}
+
+	.formation-card .formation-mark {
+		border-color: white;
+		color: white;
+		font-size: 0.85rem;
+	}
+
+	.formation-card .card-action {
+		color: #e7f7eb;
 	}
 
 	.note-card {

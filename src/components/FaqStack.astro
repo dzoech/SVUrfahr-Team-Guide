@@ -19,7 +19,7 @@ const questions = await Promise.all(
 
 	<div class="questions">
 		{questions.map(({ entry, Content }) => (
-			<details>
+			<details id={entry.id}>
 				<summary>
 					<span>{entry.data.question}</span>
 					<span class="plus" aria-hidden="true"></span>
@@ -31,6 +31,21 @@ const questions = await Promise.all(
 		))}
 	</div>
 </section>
+
+<script>
+	function openLinkedQuestion() {
+		const questionId = decodeURIComponent(window.location.hash.slice(1));
+		const question = questionId ? document.getElementById(questionId) : null;
+
+		if (question instanceof HTMLDetailsElement) {
+			question.open = true;
+		}
+	}
+
+	openLinkedQuestion();
+	document.addEventListener('astro:page-load', openLinkedQuestion);
+	window.addEventListener('hashchange', openLinkedQuestion);
+</script>
 
 <style>
 	.card-stack {
@@ -85,6 +100,7 @@ const questions = await Promise.all(
 	}
 
 	details {
+		scroll-margin-top: 5.5rem;
 		border: 1px solid #d6c99e;
 		border-radius: 0.55rem;
 		background: rgb(255 254 246 / 88%);
@@ -144,6 +160,10 @@ const questions = await Promise.all(
 
 	.answer :global(p) {
 		margin: 0;
+	}
+
+	.answer :global(p + p) {
+		margin-top: 0.7rem;
 	}
 
 	.answer :global(ul) {

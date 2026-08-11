@@ -159,4 +159,41 @@ const items = await Promise.all(
 		line-height: 1.48;
 		overflow-wrap: anywhere;
 	}
+
+	.copy :global(p + p) {
+		margin-top: 0.65rem;
+	}
+
+	.copy :global(ul) {
+		display: grid;
+		gap: 0.65rem;
+		padding: 0;
+		margin: 0.7rem 0 0;
+		list-style: none;
+	}
+
+	.copy :global(ul li) {
+		position: relative;
+		display: block;
+		padding: 0 0 0 1rem;
+		border: 0;
+		color: var(--muted);
+		font-size: 0.9rem;
+		line-height: 1.48;
+	}
+
+	.copy :global(ul li)::before {
+		content: "";
+		position: absolute;
+		top: 0.55rem;
+		left: 0;
+		width: 0.4rem;
+		height: 0.4rem;
+		border-radius: 50%;
+		background: var(--accent);
+	}
+
+	.copy :global(strong) {
+		color: var(--ink);
+	}
 </style>
