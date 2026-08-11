@@ -145,6 +145,97 @@ const timeFormatter = new Intl.DateTimeFormat('de-AT', {
 </BaseLayout>
 
 <script>
+	function createTeamScarfExplosion(scarf: HTMLButtonElement) {
+		if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+		document.querySelectorAll('[data-scarf-confetti]').forEach((explosion) => explosion.remove());
+
+		const scarfBounds = scarf.getBoundingClientRect();
+		const scarfImage = scarf.querySelector<HTMLImageElement>('img');
+		const explosion = document.createElement('div');
+		const colors = ['#ed1c24', '#c8101e', '#ff3038', '#090909', '#171717', '#242020'];
+		const particleCount = 320;
+		const travelDistance = Math.max(window.innerWidth, window.innerHeight);
+
+		explosion.className = 'scarf-confetti-explosion';
+		explosion.dataset.scarfConfetti = '';
+		explosion.setAttribute('aria-hidden', 'true');
+		explosion.style.left = `${scarfBounds.left + scarfBounds.width / 2}px`;
+		explosion.style.top = `${scarfBounds.top + scarfBounds.height / 2}px`;
+
+		if (scarfImage) {
+			const columns = 16;
+			const rows = 3;
+			const shardWidth = scarfBounds.width / columns;
+			const shardHeight = scarfBounds.height / rows;
+			const imageUrl = scarfImage.currentSrc || scarfImage.src;
+
+			for (let row = 0; row < rows; row += 1) {
+				for (let column = 0; column < columns; column += 1) {
+					const shard = document.createElement('i');
+					const startX = column * shardWidth - scarfBounds.width / 2;
+					const startY = row * shardHeight - scarfBounds.height / 2;
+					const angle = -Math.PI + Math.random() * Math.PI;
+					const distance = travelDistance * (0.18 + Math.random() * 0.32);
+					const travelX = Math.cos(angle) * distance;
+					const travelY = Math.sin(angle) * distance * 0.7;
+					const spin = (Math.random() < 0.5 ? -1 : 1) * (240 + Math.random() * 720);
+
+					shard.className = 'scarf-shard';
+					shard.style.width = `${shardWidth + 0.7}px`;
+					shard.style.height = `${shardHeight + 0.7}px`;
+					shard.style.backgroundImage = `url("${imageUrl}")`;
+					shard.style.backgroundSize = `${scarfBounds.width}px ${scarfBounds.height}px`;
+					shard.style.backgroundPosition = `${-column * shardWidth}px ${-row * shardHeight}px`;
+					shard.style.setProperty('--start-x', `${startX}px`);
+					shard.style.setProperty('--start-y', `${startY}px`);
+					shard.style.setProperty('--shard-mid-x', `${startX + travelX * 0.58}px`);
+					shard.style.setProperty('--shard-mid-y', `${startY + travelY * 0.58 - 22}px`);
+					shard.style.setProperty('--shard-end-x', `${startX + travelX * 1.12}px`);
+					shard.style.setProperty(
+						'--shard-end-y',
+						`${startY + travelY + window.innerHeight * (0.14 + Math.random() * 0.2)}px`,
+					);
+					shard.style.setProperty('--shard-mid-spin', `${spin * 0.55}deg`);
+					shard.style.setProperty('--shard-spin', `${spin}deg`);
+					shard.style.setProperty('--shard-delay', `${Math.random() * 35}ms`);
+					shard.style.setProperty('--shard-duration', `${820 + Math.random() * 360}ms`);
+					explosion.append(shard);
+				}
+			}
+		}
+
+		for (let index = 0; index < particleCount; index += 1) {
+			const particle = document.createElement('i');
+			const angle = -Math.PI + Math.random() * Math.PI;
+			const distance = travelDistance * (0.3 + Math.random() * 0.5);
+			const burstX = Math.cos(angle) * distance;
+			const burstY = Math.sin(angle) * distance * 0.78 - Math.random() * 35;
+			const fallX = burstX * (1.05 + Math.random() * 0.18) + (Math.random() - 0.5) * 90;
+			const fallY = burstY + window.innerHeight * (0.2 + Math.random() * 0.38);
+			const spin = (Math.random() < 0.5 ? -1 : 1) * (540 + Math.random() * 1260);
+			const width = 5 + Math.random() * 9;
+			const height = width * (1.25 + Math.random() * 1.25);
+
+			particle.className = 'scarf-confetti';
+			particle.style.setProperty('--burst-x', `${burstX}px`);
+			particle.style.setProperty('--burst-y', `${burstY}px`);
+			particle.style.setProperty('--fall-x', `${fallX}px`);
+			particle.style.setProperty('--fall-y', `${fallY}px`);
+			particle.style.setProperty('--mid-spin', `${spin * 0.58}deg`);
+			particle.style.setProperty('--spin', `${spin}deg`);
+			particle.style.setProperty('--piece-width', `${width}px`);
+			particle.style.setProperty('--piece-height', `${height}px`);
+			particle.style.setProperty('--piece-color', colors[index % colors.length]);
+			particle.style.setProperty('--delay', `${Math.random() * 70}ms`);
+			particle.style.setProperty('--duration', `${900 + Math.random() * 500}ms`);
+			explosion.append(particle);
+		}
+
+		document.body.append(explosion);
+		window.setTimeout(() => explosion.remove(), 1600);
+	}
+
 	function initializeTeamScarf() {
 		const scarves = document.querySelectorAll<HTMLButtonElement>('[data-team-scarf]');
 		const storageKey = 'sv-urfahr-guide:scarf-state';
@@ -164,9 +255,12 @@ const timeFormatter = new Intl.DateTimeFormat('de-AT', {
 
 			scarf.addEventListener('click', () => {
 				if (scarf.classList.contains('dropped-resting')) {
+					const dismissal = Math.random() < 0.5 ? 'exploding' : 'flying-away';
+					if (dismissal === 'exploding') createTeamScarfExplosion(scarf);
+
 					window.localStorage.removeItem(storageKey);
 					scarf.classList.remove('dropped-resting');
-					scarf.classList.add('dismissing');
+					scarf.classList.add('dismissing', dismissal);
 					scarf.setAttribute('aria-pressed', 'false');
 					scarf.setAttribute('aria-label', 'Fanschal wird ausgeblendet');
 					return;
@@ -190,8 +284,11 @@ const timeFormatter = new Intl.DateTimeFormat('de-AT', {
 					scarf.setAttribute('aria-label', 'Fanschal ausblenden');
 				}
 
-				if (event.animationName === 'scarf-dismiss') {
-					scarf.classList.remove('dismissing');
+				if (
+					event.animationName === 'scarf-dismiss-explosion' ||
+					event.animationName === 'scarf-dismiss-flyaway'
+				) {
+					scarf.classList.remove('dismissing', 'exploding', 'flying-away');
 					scarf.hidden = true;
 				}
 			});
@@ -331,7 +428,14 @@ const timeFormatter = new Intl.DateTimeFormat('de-AT', {
 	.team-scarf.dismissing {
 		z-index: 30;
 		pointer-events: none;
-		animation: scarf-dismiss 1.15s linear both;
+	}
+
+	.team-scarf.dismissing.exploding {
+		animation: scarf-dismiss-explosion 360ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+	}
+
+	.team-scarf.dismissing.flying-away {
+		animation: scarf-dismiss-flyaway 1.15s linear both;
 	}
 
 	.team-scarf.dropped::after,
@@ -351,6 +455,49 @@ const timeFormatter = new Intl.DateTimeFormat('de-AT', {
 	.team-scarf.dropped-resting + .home,
 	.team-scarf.dismissing + .home {
 		padding-bottom: calc(6rem + env(safe-area-inset-bottom));
+	}
+
+	:global(.scarf-confetti-explosion) {
+		position: fixed;
+		z-index: 45;
+		width: 0;
+		height: 0;
+		pointer-events: none;
+	}
+
+	:global(.scarf-confetti) {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: var(--piece-width);
+		height: var(--piece-height);
+		border-radius: 0.08rem;
+		background: var(--piece-color);
+		box-shadow: 0 0.12rem 0.18rem rgb(0 0 0 / 28%);
+		opacity: 0;
+		transform-origin: center;
+		animation: confetti-explode var(--duration) cubic-bezier(0.12, 0.58, 0.28, 1) var(--delay) both;
+	}
+
+	:global(.scarf-shard) {
+		position: absolute;
+		top: 0;
+		left: 0;
+		background-repeat: no-repeat;
+		filter: drop-shadow(0 0.15rem 0.18rem rgb(0 0 0 / 30%));
+		opacity: 0;
+		transform-origin: center;
+		animation:
+			scarf-shard-explode var(--shard-duration) cubic-bezier(0.12, 0.58, 0.25, 1)
+			var(--shard-delay) both;
+	}
+
+	:global(.scarf-confetti:nth-child(3n)) {
+		border-radius: 50%;
+	}
+
+	:global(.scarf-confetti:nth-child(4n)) {
+		clip-path: polygon(50% 0, 100% 100%, 0 100%);
 	}
 
 	.desk-menu {
@@ -869,7 +1016,38 @@ const timeFormatter = new Intl.DateTimeFormat('de-AT', {
 		}
 	}
 
-	@keyframes scarf-dismiss {
+	@keyframes scarf-dismiss-explosion {
+		0% {
+			top: 100svh;
+			left: 50%;
+			width: min(calc(100vw - 1rem), 30rem);
+			opacity: 1;
+			filter:
+				drop-shadow(0.15rem 0.55rem 0.38rem rgb(0 0 0 / 40%))
+				saturate(0.96);
+			transform: translate(-50%, -80%) rotate(720deg) scale(1);
+		}
+		12% {
+			opacity: 1;
+			filter:
+				drop-shadow(0 0 1.4rem rgb(237 28 36 / 92%))
+				brightness(1.65)
+				saturate(1.45);
+			transform: translate(-50%, -80%) rotate(720deg) scale(1.06);
+		}
+		24% {
+			opacity: 0;
+			filter: blur(0.15rem) brightness(2) saturate(1.6);
+			transform: translate(-50%, -80%) rotate(722deg) scale(1.13);
+		}
+		100% {
+			opacity: 0;
+			filter: blur(0.15rem) brightness(2) saturate(1.6);
+			transform: translate(-50%, -80%) rotate(722deg) scale(1.13);
+		}
+	}
+
+	@keyframes scarf-dismiss-flyaway {
 		0% {
 			top: 100svh;
 			left: 50%;
@@ -913,6 +1091,57 @@ const timeFormatter = new Intl.DateTimeFormat('de-AT', {
 			opacity: 0;
 			filter: blur(1.25rem) brightness(1.25) saturate(1.15);
 			transform: translate(-50%, -50%) rotate(1260deg) scale(8);
+		}
+	}
+
+	@keyframes scarf-shard-explode {
+		0% {
+			opacity: 1;
+			transform: translate3d(var(--start-x), var(--start-y), 0) rotate(0) scale(1);
+		}
+		12% {
+			opacity: 1;
+			filter: drop-shadow(0 0 0.45rem rgb(237 28 36 / 65%)) brightness(1.2);
+		}
+		58% {
+			opacity: 1;
+			transform:
+				translate3d(var(--shard-mid-x), var(--shard-mid-y), 0)
+				rotate(var(--shard-mid-spin))
+				scale(0.78);
+		}
+		100% {
+			opacity: 0;
+			filter: blur(0.18rem) brightness(0.72);
+			transform:
+				translate3d(var(--shard-end-x), var(--shard-end-y), 0)
+				rotate(var(--shard-spin))
+				scale(0.22);
+		}
+	}
+
+	@keyframes confetti-explode {
+		0% {
+			opacity: 0;
+			transform: translate3d(0, 0, 0) rotate(0) scale(0.15);
+		}
+		8% {
+			opacity: 1;
+			transform: translate3d(0, -0.5rem, 0) rotate(45deg) scale(1.15);
+		}
+		58% {
+			opacity: 1;
+			transform:
+				translate3d(var(--burst-x), var(--burst-y), 0)
+				rotate(var(--mid-spin))
+				scale(1);
+		}
+		100% {
+			opacity: 0;
+			transform:
+				translate3d(var(--fall-x), var(--fall-y), 0)
+				rotate(var(--spin))
+				scale(0.72);
 		}
 	}
 
