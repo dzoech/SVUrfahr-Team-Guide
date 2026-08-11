@@ -6,6 +6,11 @@ export const CALENDAR_URL =
 
 export const CALENDAR_SUBSCRIPTION_URL = CALENDAR_URL.replace(/^https:/, 'webcal:');
 
+const HIDDEN_EVENT_OCCURRENCES = new Set([
+	'4165292|2026-09-04T16:15:00.000Z',
+	'4165298|2026-09-11T16:15:00.000Z',
+]);
+
 export interface CalendarEvent {
 	id: string;
 	title: string;
@@ -66,6 +71,7 @@ async function loadUpcomingEvents(): Promise<CalendarEvent[]> {
 
 	return Object.values(parsed)
 		.filter(isEvent)
+		.filter((event) => !HIDDEN_EVENT_OCCURRENCES.has(`${event.uid}|${event.start.toISOString()}`))
 		.filter((event) => {
 			if (event.status === 'CANCELLED') {
 				return false;

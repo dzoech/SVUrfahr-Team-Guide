@@ -73,7 +73,7 @@ Bitte spätestens **15 Minuten vorher** am Platz sein.
 General site labels are in `src/config.ts`. The calendar URL can be replaced in
 `src/lib/calendar.ts` or supplied as the `CALENDAR_URL` build variable.
 
-The SV Urfahr crest in `public/sv-urfahr-logo.png` is derived from the
+The SV Urfahr crest in `src/assets/sv-urfahr-logo.png` is derived from the
 [club image supplied for this site](https://www.freiwillig-engagiert.at/files/userdata/Organisationen%20%28Freiwillig%20Engagiert%29/Sportvereinigung_Urfahr_1912/SV-Urfahr_Wappen_hintergrund%20%281%29.jpg).
 Its lower exterior corners were made transparent for use on the dark header.
 

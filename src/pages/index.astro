@@ -1,7 +1,10 @@
 ---
 import '@fontsource/caveat/latin-600.css';
+import { Image } from 'astro:assets';
+import clubLogo from '../assets/sv-urfahr-logo.png';
+import teamScarf from '../assets/sv-urfahr-schal.png';
 import SiteHeader from '../components/SiteHeader.astro';
-import { assetPath, pagePath, SITE } from '../config';
+import { pagePath, SITE } from '../config';
 import { getUpcomingEvents } from '../lib/calendar';
 import BaseLayout from '../layouts/BaseLayout.astro';
 
@@ -23,6 +26,70 @@ const timeFormatter = new Intl.DateTimeFormat('de-AT', {
 <BaseLayout>
 	<SiteHeader />
 
+	<div class="folder-intro" data-folder-intro>
+		<button
+			class="folder-intro-cover"
+			type="button"
+			aria-label="Mannschaftsmappe öffnen"
+			data-folder-intro-open
+		>
+			<span class="folder-intro-tab">U11</span>
+			<div class="folder-intro-label">
+				<small>SV Urfahr 1912</small>
+				<strong>Mannschafts-<br />mappe</strong>
+				<em>Zum Öffnen tippen</em>
+			</div>
+			<span class="folder-coffee-liquid" aria-hidden="true"></span>
+			<span class="folder-coffee-stain" aria-hidden="true"></span>
+			<span class="folder-coffee-drops" aria-hidden="true"></span>
+			<Image
+				class="folder-logo-stamp"
+				src={clubLogo}
+				alt=""
+				aria-hidden="true"
+			/>
+		</button>
+	</div>
+	<script is:inline data-astro-rerun>
+		{
+			const folderIntro = document.currentScript?.previousElementSibling;
+			if (folderIntro instanceof HTMLElement) {
+				const storageKey = 'sv-urfahr-guide:folder-intro-seen';
+				const openButton = folderIntro.querySelector('[data-folder-intro-open]');
+
+				if (
+					window.sessionStorage.getItem(storageKey) !== 'true' &&
+					openButton instanceof HTMLButtonElement
+				) {
+					document.documentElement.classList.add('folder-intro-pending');
+					folderIntro.classList.add('active');
+					openButton.addEventListener(
+						'click',
+						() => {
+							window.sessionStorage.setItem(storageKey, 'true');
+
+							if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+								document.documentElement.classList.remove('folder-intro-pending');
+								folderIntro.remove();
+								return;
+							}
+
+							folderIntro.classList.add('opening');
+							window.setTimeout(() => {
+								document.documentElement.classList.remove('folder-intro-pending');
+								folderIntro.remove();
+							}, 1950);
+						},
+						{ once: true },
+					);
+				} else {
+					document.documentElement.classList.remove('folder-intro-pending');
+					folderIntro.remove();
+				}
+			}
+		}
+	</script>
+
 	<button
 		class="team-scarf"
 		type="button"
@@ -31,10 +98,8 @@ const timeFormatter = new Intl.DateTimeFormat('de-AT', {
 		data-team-scarf
 		style="appearance: none; border: 0; background: transparent; padding: 0;"
 	>
-		<img
-			src={assetPath('sv-urfahr-schal.png')}
-			width="1100"
-			height="194"
+		<Image
+			src={teamScarf}
 			alt=""
 			decoding="async"
 		/>
@@ -140,11 +205,28 @@ const timeFormatter = new Intl.DateTimeFormat('de-AT', {
 			</a>
 		</nav>
 
-		<footer>{SITE.team}</footer>
+		<footer>
+			<span>{SITE.team}</span>
+			<button type="button" data-replay-folder-intro>Mappe schließen</button>
+		</footer>
 	</main>
 </BaseLayout>
 
 <script>
+	function initializeFolderIntroReplay() {
+		const replayLinks = document.querySelectorAll<HTMLButtonElement>('[data-replay-folder-intro]');
+
+		for (const replayLink of replayLinks) {
+			if (replayLink.dataset.initialized === 'true') continue;
+			replayLink.dataset.initialized = 'true';
+
+			replayLink.addEventListener('click', () => {
+				window.sessionStorage.removeItem('sv-urfahr-guide:folder-intro-seen');
+				window.location.reload();
+			});
+		}
+	}
+
 	function createTeamScarfExplosion(scarf: HTMLButtonElement) {
 		if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
@@ -295,11 +377,233 @@ const timeFormatter = new Intl.DateTimeFormat('de-AT', {
 		}
 	}
 
-	initializeTeamScarf();
-	document.addEventListener('astro:page-load', initializeTeamScarf);
+	function initializeHomePage() {
+		initializeFolderIntroReplay();
+		initializeTeamScarf();
+	}
+
+	initializeHomePage();
+	document.addEventListener('astro:page-load', initializeHomePage);
 </script>
 
 <style>
+	.folder-intro {
+		display: none;
+	}
+
+	.folder-intro.active {
+		position: fixed;
+		z-index: 100;
+		inset: 0;
+		display: block;
+		overflow: hidden;
+		background: #2a1113;
+		perspective: 70rem;
+	}
+
+	.folder-intro.opening {
+		pointer-events: none;
+		animation: folder-intro-finish 1.9s ease-in both;
+	}
+
+	:global(html.folder-intro-pending) .team-scarf:not(.dropped-resting),
+	:global(html.folder-intro-pending) .team-scarf:not(.dropped-resting) img {
+		visibility: hidden;
+		animation: none;
+	}
+
+	.folder-intro-cover {
+		position: absolute;
+		z-index: 2;
+		inset: 5svh 3vw -8svh;
+		width: auto;
+		padding: 0;
+		border: 0.12rem solid rgb(78 42 20 / 45%);
+		border-radius: 0.45rem 0.45rem 1rem 1rem;
+		appearance: none;
+		background:
+			linear-gradient(102deg, rgb(255 255 255 / 8%), transparent 26% 71%, rgb(74 35 16 / 10%)),
+			repeating-linear-gradient(88deg, transparent 0 7px, rgb(86 46 22 / 5%) 8px 9px),
+			#b9824c;
+		box-shadow:
+			inset 0 0 0 0.2rem rgb(255 255 255 / 7%),
+			0 -0.4rem 1.4rem rgb(0 0 0 / 28%),
+			0 1.5rem 3rem rgb(0 0 0 / 45%);
+		color: inherit;
+		cursor: pointer;
+		transform-origin: center bottom;
+		transform-style: preserve-3d;
+		backface-visibility: hidden;
+	}
+
+	.folder-intro.opening .folder-intro-cover {
+		animation: folder-cover-open 1.6s cubic-bezier(0.3, 0.05, 0.2, 1) 120ms both;
+	}
+
+	.folder-intro-cover::before {
+		content: "";
+		position: absolute;
+		top: -2.7rem;
+		left: 1rem;
+		width: 42%;
+		height: 3rem;
+		border: inherit;
+		border-bottom: 0;
+		border-radius: 0.7rem 1.1rem 0 0;
+		background: #b9824c;
+	}
+
+	.folder-intro-tab {
+		position: absolute;
+		z-index: 1;
+		top: -2rem;
+		left: 2rem;
+		color: rgb(61 31 17 / 78%);
+		font-size: 0.82rem;
+		font-weight: 950;
+		letter-spacing: 0.12em;
+	}
+
+	.folder-intro-label {
+		position: absolute;
+		top: 35%;
+		left: 50%;
+		display: grid;
+		width: min(calc(100% - 3rem), 21rem);
+		min-width: 0;
+		gap: 0.3rem;
+		padding: 1.1rem 0.9rem 1rem;
+		overflow: hidden;
+		border: 0.38rem double #a91820;
+		color: #211b18;
+		background: #f5e8c9;
+		box-shadow: 0 0.35rem 0.7rem rgb(68 36 17 / 28%);
+		text-align: center;
+		text-transform: uppercase;
+		transform: translate(-50%, -50%) rotate(-1.2deg);
+	}
+
+	.folder-intro-label small {
+		color: #a91820;
+		font-size: 0.72rem;
+		font-weight: 950;
+		letter-spacing: 0.1em;
+	}
+
+	.folder-intro-label strong {
+		min-width: 0;
+		font-family: ui-rounded, "Arial Rounded MT Bold", sans-serif;
+		font-size: clamp(1.55rem, 8vw, 2.35rem);
+		line-height: 0.95;
+		letter-spacing: -0.045em;
+	}
+
+	.folder-intro-label em {
+		margin-top: 0.3rem;
+		color: rgb(33 27 24 / 65%);
+		font-size: 0.68rem;
+		font-style: normal;
+		font-weight: 850;
+		letter-spacing: 0.08em;
+	}
+
+	.folder-coffee-stain {
+		position: absolute;
+		right: -7%;
+		bottom: 13%;
+		width: clamp(8.3rem, 40vw, 10.9rem);
+		aspect-ratio: 1;
+		border-radius: 50%;
+		background: conic-gradient(
+			from 18deg,
+			rgb(45 17 6 / 68%) 0 24%,
+			rgb(45 17 6 / 48%) 27% 40%,
+			transparent 41% 43%,
+			rgb(45 17 6 / 64%) 44% 78%,
+			rgb(45 17 6 / 42%) 81% 91%,
+			transparent 92% 94%,
+			rgb(45 17 6 / 62%) 95% 100%
+		);
+		filter: blur(0.055rem) drop-shadow(0 0 0.14rem rgb(45 17 6 / 28%));
+		-webkit-mask: radial-gradient(circle, transparent 0 54%, #000 56% 62%, transparent 65%);
+		mask: radial-gradient(circle, transparent 0 54%, #000 56% 62%, transparent 65%);
+		mix-blend-mode: multiply;
+		opacity: 0.76;
+		transform: rotate(12deg);
+	}
+
+	.folder-coffee-liquid {
+		position: absolute;
+		right: -6%;
+		bottom: 7%;
+		width: clamp(8rem, 38vw, 10.5rem);
+		height: clamp(4.5rem, 21vw, 6rem);
+		border-radius: 58% 42% 64% 36% / 48% 62% 38% 52%;
+		background:
+			radial-gradient(ellipse at 40% 46%, rgb(43 16 6 / 42%) 0 34%, rgb(43 16 6 / 25%) 48%, transparent 69%),
+			radial-gradient(ellipse at 72% 62%, rgb(43 16 6 / 46%) 0 17%, transparent 44%),
+			radial-gradient(circle at 15% 72%, rgb(43 16 6 / 38%) 0 8%, transparent 12%);
+		box-shadow:
+			inset 0.35rem -0.25rem 0.5rem rgb(32 11 3 / 24%),
+			-1.1rem 0.65rem 0 -0.72rem rgb(43 16 6 / 32%);
+		filter: blur(0.08rem);
+		mix-blend-mode: multiply;
+		transform: rotate(-9deg);
+	}
+
+	.folder-coffee-stain::before {
+		content: "";
+		position: absolute;
+		inset: 0.35rem;
+		border: 0.1rem solid rgb(45 17 6 / 52%);
+		border-radius: 50%;
+		transform: rotate(-7deg);
+	}
+
+	.folder-coffee-drops {
+		position: absolute;
+		right: -1%;
+		bottom: 11%;
+		width: 0.66rem;
+		aspect-ratio: 0.82;
+		border-radius: 55% 45% 62% 38%;
+		background: rgb(43 16 6 / 72%);
+		box-shadow:
+			-1.1rem 0.7rem 0 -0.08rem rgb(43 16 6 / 56%),
+			0.5rem 1.1rem 0 0.02rem rgb(43 16 6 / 62%),
+			-2.1rem -0.35rem 0 -0.12rem rgb(43 16 6 / 48%),
+			1.25rem -0.95rem 0 0.12rem rgb(43 16 6 / 58%),
+			-2.8rem 1.5rem 0 -0.07rem rgb(43 16 6 / 46%),
+			1.15rem 2rem 0 0.08rem rgb(43 16 6 / 54%),
+			-1.6rem -1.7rem 0 -0.15rem rgb(43 16 6 / 42%),
+			2rem 0.45rem 0 -0.12rem rgb(43 16 6 / 50%),
+			-3.4rem 0.15rem 0 0.06rem rgb(43 16 6 / 44%),
+			2.5rem -1.4rem 0 -0.05rem rgb(43 16 6 / 48%),
+			-0.4rem 2.7rem 0 0.14rem rgb(43 16 6 / 52%),
+			1.9rem 2.4rem 0 -0.1rem rgb(43 16 6 / 46%);
+		mix-blend-mode: multiply;
+		transform: rotate(-22deg);
+	}
+
+	.folder-logo-stamp {
+		position: absolute;
+		bottom: 36%;
+		left: 9%;
+		width: clamp(4.5rem, 20vw, 6.2rem);
+		height: auto;
+		filter:
+			grayscale(1)
+			brightness(3.4)
+			contrast(9)
+			drop-shadow(0.065rem 0 0 #171515)
+			drop-shadow(-0.065rem 0 0 #171515)
+			drop-shadow(0 0.065rem 0 #171515)
+			drop-shadow(0 -0.065rem 0 #171515);
+		mix-blend-mode: multiply;
+		opacity: 0.68;
+		transform: rotate(-13deg);
+	}
+
 	.home {
 		display: grid;
 		width: min(100%, 30rem);
@@ -380,25 +684,6 @@ const timeFormatter = new Intl.DateTimeFormat('de-AT', {
 		-webkit-tap-highlight-color: transparent;
 	}
 
-	.team-scarf::after {
-		content: "";
-		position: absolute;
-		z-index: 2;
-		top: 50%;
-		left: 92%;
-		width: 2.25rem;
-		aspect-ratio: 1;
-		border: 0.12rem solid rgb(255 255 255 / 12%);
-		border-radius: 50%;
-		background:
-			radial-gradient(circle at 55% 42%, #ee1d24 0 17%, #161313 19% 34%, #c51d24 36% 50%, #151313 52% 68%, #a81217 70%);
-		box-shadow:
-			inset 0 0 0.4rem rgb(0 0 0 / 55%),
-			0.18rem 0.32rem 0.32rem rgb(0 0 0 / 45%);
-		transform: translate(-50%, -50%);
-		animation: scarf-roll 1.05s cubic-bezier(0.3, 0.7, 0.2, 1) 320ms both;
-	}
-
 	.team-scarf img {
 		display: block;
 		width: 100%;
@@ -413,7 +698,7 @@ const timeFormatter = new Intl.DateTimeFormat('de-AT', {
 	.team-scarf.dropped {
 		cursor: default;
 		pointer-events: none;
-		animation: scarf-drop-bottom 3.2s linear both;
+		animation: scarf-drop-bottom 1.6s linear both;
 	}
 
 	.team-scarf.dropped-resting {
@@ -421,7 +706,7 @@ const timeFormatter = new Intl.DateTimeFormat('de-AT', {
 		left: 50%;
 		width: min(calc(100vw - 1rem), 30rem);
 		cursor: pointer;
-		transform: translate(-50%, -80%) rotate(720deg);
+		transform: translate(-50%, -80%) rotate(360deg);
 		animation: none;
 	}
 
@@ -438,12 +723,6 @@ const timeFormatter = new Intl.DateTimeFormat('de-AT', {
 		animation: scarf-dismiss-flyaway 1.15s linear both;
 	}
 
-	.team-scarf.dropped::after,
-	.team-scarf.dropped-resting::after,
-	.team-scarf.dismissing::after {
-		display: none;
-	}
-
 	.team-scarf.dropped img,
 	.team-scarf.dropped-resting img,
 	.team-scarf.dismissing img {
@@ -451,10 +730,10 @@ const timeFormatter = new Intl.DateTimeFormat('de-AT', {
 		transform: none;
 	}
 
-	.team-scarf.dropped + .home,
-	.team-scarf.dropped-resting + .home,
-	.team-scarf.dismissing + .home {
-		padding-bottom: calc(6rem + env(safe-area-inset-bottom));
+	.team-scarf.dropped ~ .home,
+	.team-scarf.dropped-resting ~ .home,
+	.team-scarf.dismissing ~ .home {
+		padding-bottom: calc(10rem + env(safe-area-inset-bottom));
 	}
 
 	:global(.scarf-confetti-explosion) {
@@ -912,10 +1191,29 @@ const timeFormatter = new Intl.DateTimeFormat('de-AT', {
 	}
 
 	footer {
+		display: grid;
+		justify-items: center;
+		gap: 0.45rem;
 		color: rgb(255 255 255 / 55%);
 		font-size: 0.72rem;
 		font-weight: 700;
 		text-align: center;
+	}
+
+	footer button {
+		padding: 0;
+		border: 0;
+		color: rgb(255 255 255 / 42%);
+		background: transparent;
+		font-size: 0.66rem;
+		text-decoration: underline;
+		text-decoration-thickness: 0.08em;
+		text-underline-offset: 0.18em;
+		cursor: pointer;
+	}
+
+	footer button:active {
+		color: rgb(255 255 255 / 72%);
 	}
 
 	@keyframes desk-drop {
@@ -925,6 +1223,36 @@ const timeFormatter = new Intl.DateTimeFormat('de-AT', {
 		}
 		to {
 			opacity: 1;
+		}
+	}
+
+	@keyframes folder-cover-open {
+		0%,
+		14% {
+			transform: rotateX(0) translateY(0) scale(1);
+		}
+		58% {
+			transform: rotateX(-72deg) translateY(2svh) scale(1.015);
+		}
+		100% {
+			transform: rotateX(-112deg) translateY(10svh) scale(1.04);
+		}
+	}
+
+	@keyframes folder-intro-finish {
+		0% {
+			background-color: #2a1113;
+			opacity: 1;
+		}
+		24%,
+		68% {
+			background-color: transparent;
+			opacity: 1;
+		}
+		100% {
+			background-color: transparent;
+			opacity: 0;
+			visibility: hidden;
 		}
 	}
 
@@ -955,22 +1283,6 @@ const timeFormatter = new Intl.DateTimeFormat('de-AT', {
 		}
 	}
 
-	@keyframes scarf-roll {
-		0% {
-			left: 92%;
-			opacity: 1;
-			transform: translate(-50%, -50%) rotate(0);
-		}
-		88% {
-			opacity: 1;
-		}
-		100% {
-			left: 0;
-			opacity: 0;
-			transform: translate(-50%, -50%) rotate(-900deg);
-		}
-	}
-
 	@keyframes scarf-drop-bottom {
 		0% {
 			top: 16rem;
@@ -982,37 +1294,37 @@ const timeFormatter = new Intl.DateTimeFormat('de-AT', {
 			top: 30svh;
 			left: calc(50% + min(36vw, 10rem));
 			width: min(116vw, 35rem);
-			transform: translate(-50%, -50%) rotate(378deg) skewX(1.5deg);
+			transform: translate(-50%, -50%) rotate(292deg) skewX(1.5deg);
 		}
 		52% {
 			top: 58svh;
 			left: calc(50% - min(9vw, 2.5rem));
 			width: min(108vw, 33rem);
-			transform: translate(-50%, -50%) rotate(504deg) skewX(-2deg);
+			transform: translate(-50%, -50%) rotate(326deg) skewX(-2deg);
 		}
 		76% {
 			top: calc(100svh - 7.5rem);
 			left: calc(50% + min(5vw, 1.4rem));
 			width: min(calc(100vw - 0.6rem), 30.5rem);
-			transform: translate(-50%, -50%) rotate(612deg) skewX(1deg);
+			transform: translate(-50%, -50%) rotate(350deg) skewX(1deg);
 		}
 		88% {
 			top: 100svh;
 			left: 50%;
 			width: min(calc(100vw - 1rem), 30rem);
-			transform: translate(-50%, -76%) rotate(727deg);
+			transform: translate(-50%, -76%) rotate(364deg);
 		}
 		95% {
 			top: 100svh;
 			left: 50%;
 			width: min(calc(100vw - 1rem), 30rem);
-			transform: translate(-50%, -84%) rotate(716deg);
+			transform: translate(-50%, -84%) rotate(356deg);
 		}
 		100% {
 			top: 100svh;
 			left: 50%;
 			width: min(calc(100vw - 1rem), 30rem);
-			transform: translate(-50%, -80%) rotate(720deg);
+			transform: translate(-50%, -80%) rotate(360deg);
 		}
 	}
 

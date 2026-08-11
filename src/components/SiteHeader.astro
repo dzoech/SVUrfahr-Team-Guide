@@ -1,14 +1,14 @@
 ---
-import { assetPath, pagePath, SITE } from '../config';
+import { Image } from 'astro:assets';
+import clubLogo from '../assets/sv-urfahr-logo.png';
+import { pagePath, SITE } from '../config';
 ---
 
 <header class="site-header" transition:persist="site-header">
 	<a class="brand" href={pagePath()} aria-label={`${SITE.team} – Startseite`}>
-		<img
+		<Image
 			class="club-logo"
-			src={assetPath('sv-urfahr-logo.png')}
-			width="480"
-			height="609"
+			src={clubLogo}
 			alt=""
 		/>
 		<span class="brand-copy">
