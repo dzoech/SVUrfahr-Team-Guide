@@ -1,7 +1,7 @@
 ---
 import '@fontsource/caveat/latin-600.css';
 import SiteHeader from '../components/SiteHeader.astro';
-import { pagePath, SITE } from '../config';
+import { assetPath, pagePath, SITE } from '../config';
 import { getUpcomingEvents } from '../lib/calendar';
 import BaseLayout from '../layouts/BaseLayout.astro';
 
@@ -22,6 +22,36 @@ const timeFormatter = new Intl.DateTimeFormat('de-AT', {
 
 <BaseLayout>
 	<SiteHeader />
+
+	<button
+		class="team-scarf"
+		type="button"
+		aria-label="Fanschal nach unten fallen lassen"
+		aria-pressed="false"
+		data-team-scarf
+		style="appearance: none; border: 0; background: transparent; padding: 0;"
+	>
+		<img
+			src={assetPath('sv-urfahr-schal.png')}
+			width="1100"
+			height="194"
+			alt=""
+			decoding="async"
+		/>
+	</button>
+	<script is:inline data-astro-rerun>
+		{
+			const scarf = document.currentScript?.previousElementSibling;
+			if (
+				scarf instanceof HTMLButtonElement &&
+				window.localStorage.getItem('sv-urfahr-guide:scarf-state') === 'dropped'
+			) {
+				scarf.classList.add('dropped-resting');
+				scarf.setAttribute('aria-pressed', 'true');
+				scarf.setAttribute('aria-label', 'Fanschal ausblenden');
+			}
+		}
+	</script>
 
 	<main class="home" transition:animate="slide">
 		<header class="welcome">
@@ -61,7 +91,7 @@ const timeFormatter = new Intl.DateTimeFormat('de-AT', {
 					<div class="postit-wrap">
 						<span class="paper-clip" aria-hidden="true"></span>
 						<aside class="attendance-note">
-							Wer nicht absagt,<br /><strong>ist da</strong>
+							Wer<br />nicht absagt, <strong>ist da</strong>
 						</aside>
 					</div>
 					<p class="practice-details">
@@ -114,6 +144,64 @@ const timeFormatter = new Intl.DateTimeFormat('de-AT', {
 	</main>
 </BaseLayout>
 
+<script>
+	function initializeTeamScarf() {
+		const scarves = document.querySelectorAll<HTMLButtonElement>('[data-team-scarf]');
+		const storageKey = 'sv-urfahr-guide:scarf-state';
+
+		for (const scarf of scarves) {
+			if (
+				window.localStorage.getItem(storageKey) === 'dropped' &&
+				!scarf.classList.contains('dropped-resting')
+			) {
+				scarf.classList.add('dropped-resting');
+				scarf.setAttribute('aria-pressed', 'true');
+				scarf.setAttribute('aria-label', 'Fanschal ausblenden');
+			}
+
+			if (scarf.dataset.initialized === 'true') continue;
+			scarf.dataset.initialized = 'true';
+
+			scarf.addEventListener('click', () => {
+				if (scarf.classList.contains('dropped-resting')) {
+					window.localStorage.removeItem(storageKey);
+					scarf.classList.remove('dropped-resting');
+					scarf.classList.add('dismissing');
+					scarf.setAttribute('aria-pressed', 'false');
+					scarf.setAttribute('aria-label', 'Fanschal wird ausgeblendet');
+					return;
+				}
+
+				if (
+					!scarf.classList.contains('dropped') &&
+					!scarf.classList.contains('dismissing')
+				) {
+					window.localStorage.setItem(storageKey, 'dropped');
+					scarf.classList.add('dropped');
+					scarf.setAttribute('aria-pressed', 'true');
+					scarf.setAttribute('aria-label', 'Fanschal fällt nach unten');
+				}
+			});
+
+			scarf.addEventListener('animationend', (event) => {
+				if (event.animationName === 'scarf-drop-bottom') {
+					scarf.classList.remove('dropped');
+					scarf.classList.add('dropped-resting');
+					scarf.setAttribute('aria-label', 'Fanschal ausblenden');
+				}
+
+				if (event.animationName === 'scarf-dismiss') {
+					scarf.classList.remove('dismissing');
+					scarf.hidden = true;
+				}
+			});
+		}
+	}
+
+	initializeTeamScarf();
+	document.addEventListener('astro:page-load', initializeTeamScarf);
+</script>
+
 <style>
 	.home {
 		display: grid;
@@ -126,11 +214,13 @@ const timeFormatter = new Intl.DateTimeFormat('de-AT', {
 			max(1.5rem, env(safe-area-inset-bottom))
 			max(0.85rem, env(safe-area-inset-left));
 		margin-inline: auto;
+		transition: padding-bottom 320ms ease;
 		overflow-x: clip;
 	}
 
 	.welcome {
 		position: relative;
+		z-index: 3;
 		padding: 1.15rem 1.1rem 1.2rem;
 		border-left: 0.35rem solid var(--accent);
 		color: white;
@@ -174,7 +264,98 @@ const timeFormatter = new Intl.DateTimeFormat('de-AT', {
 		font-size: 0.92rem;
 	}
 
+	.team-scarf {
+		position: fixed;
+		z-index: 18;
+		top: 16rem;
+		left: calc(50% + min(50vw, 15rem));
+		width: min(120vw, 36rem);
+		padding: 0;
+		border: 0;
+		appearance: none;
+		background: transparent;
+		cursor: pointer;
+		filter:
+			drop-shadow(0.15rem 0.55rem 0.38rem rgb(0 0 0 / 40%))
+			saturate(0.96);
+		transform-origin: 50% 50%;
+		animation: scarf-settle 1.15s cubic-bezier(0.2, 0.8, 0.25, 1) 280ms both;
+		-webkit-tap-highlight-color: transparent;
+	}
+
+	.team-scarf::after {
+		content: "";
+		position: absolute;
+		z-index: 2;
+		top: 50%;
+		left: 92%;
+		width: 2.25rem;
+		aspect-ratio: 1;
+		border: 0.12rem solid rgb(255 255 255 / 12%);
+		border-radius: 50%;
+		background:
+			radial-gradient(circle at 55% 42%, #ee1d24 0 17%, #161313 19% 34%, #c51d24 36% 50%, #151313 52% 68%, #a81217 70%);
+		box-shadow:
+			inset 0 0 0.4rem rgb(0 0 0 / 55%),
+			0.18rem 0.32rem 0.32rem rgb(0 0 0 / 45%);
+		transform: translate(-50%, -50%);
+		animation: scarf-roll 1.05s cubic-bezier(0.3, 0.7, 0.2, 1) 320ms both;
+	}
+
+	.team-scarf img {
+		display: block;
+		width: 100%;
+		height: auto;
+		transform-origin: 100% 50%;
+		animation:
+			scarf-unfurl 1.05s cubic-bezier(0.3, 0.7, 0.2, 1) 320ms both,
+			scarf-wave 6.5s linear 1.7s infinite;
+		backface-visibility: hidden;
+	}
+
+	.team-scarf.dropped {
+		cursor: default;
+		pointer-events: none;
+		animation: scarf-drop-bottom 3.2s linear both;
+	}
+
+	.team-scarf.dropped-resting {
+		top: 100svh;
+		left: 50%;
+		width: min(calc(100vw - 1rem), 30rem);
+		cursor: pointer;
+		transform: translate(-50%, -80%) rotate(720deg);
+		animation: none;
+	}
+
+	.team-scarf.dismissing {
+		z-index: 30;
+		pointer-events: none;
+		animation: scarf-dismiss 1.15s linear both;
+	}
+
+	.team-scarf.dropped::after,
+	.team-scarf.dropped-resting::after,
+	.team-scarf.dismissing::after {
+		display: none;
+	}
+
+	.team-scarf.dropped img,
+	.team-scarf.dropped-resting img,
+	.team-scarf.dismissing img {
+		animation: none;
+		transform: none;
+	}
+
+	.team-scarf.dropped + .home,
+	.team-scarf.dropped-resting + .home,
+	.team-scarf.dismissing + .home {
+		padding-bottom: calc(6rem + env(safe-area-inset-bottom));
+	}
+
 	.desk-menu {
+		position: relative;
+		z-index: 2;
 		display: grid;
 		grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
 		gap: 0.85rem;
@@ -597,6 +778,160 @@ const timeFormatter = new Intl.DateTimeFormat('de-AT', {
 		}
 		to {
 			opacity: 1;
+		}
+	}
+
+	@keyframes scarf-settle {
+		from {
+			filter:
+				drop-shadow(0.1rem 0.25rem 0.22rem rgb(0 0 0 / 30%))
+				saturate(0.96);
+			transform: translate(-50%, -50%) translateX(1.25rem) rotate(262deg);
+		}
+		65% {
+			transform: translate(-50%, -50%) translateX(-0.15rem) rotate(272deg);
+		}
+		to {
+			filter:
+				drop-shadow(0.15rem 0.55rem 0.38rem rgb(0 0 0 / 40%))
+				saturate(0.96);
+			transform: translate(-50%, -50%) rotate(270deg);
+		}
+	}
+
+	@keyframes scarf-unfurl {
+		from {
+			clip-path: inset(0 0 0 92%);
+		}
+		to {
+			clip-path: inset(0);
+		}
+	}
+
+	@keyframes scarf-roll {
+		0% {
+			left: 92%;
+			opacity: 1;
+			transform: translate(-50%, -50%) rotate(0);
+		}
+		88% {
+			opacity: 1;
+		}
+		100% {
+			left: 0;
+			opacity: 0;
+			transform: translate(-50%, -50%) rotate(-900deg);
+		}
+	}
+
+	@keyframes scarf-drop-bottom {
+		0% {
+			top: 16rem;
+			left: calc(50% + min(50vw, 15rem));
+			width: min(120vw, 36rem);
+			transform: translate(-50%, -50%) rotate(270deg);
+		}
+		24% {
+			top: 30svh;
+			left: calc(50% + min(36vw, 10rem));
+			width: min(116vw, 35rem);
+			transform: translate(-50%, -50%) rotate(378deg) skewX(1.5deg);
+		}
+		52% {
+			top: 58svh;
+			left: calc(50% - min(9vw, 2.5rem));
+			width: min(108vw, 33rem);
+			transform: translate(-50%, -50%) rotate(504deg) skewX(-2deg);
+		}
+		76% {
+			top: calc(100svh - 7.5rem);
+			left: calc(50% + min(5vw, 1.4rem));
+			width: min(calc(100vw - 0.6rem), 30.5rem);
+			transform: translate(-50%, -50%) rotate(612deg) skewX(1deg);
+		}
+		88% {
+			top: 100svh;
+			left: 50%;
+			width: min(calc(100vw - 1rem), 30rem);
+			transform: translate(-50%, -76%) rotate(727deg);
+		}
+		95% {
+			top: 100svh;
+			left: 50%;
+			width: min(calc(100vw - 1rem), 30rem);
+			transform: translate(-50%, -84%) rotate(716deg);
+		}
+		100% {
+			top: 100svh;
+			left: 50%;
+			width: min(calc(100vw - 1rem), 30rem);
+			transform: translate(-50%, -80%) rotate(720deg);
+		}
+	}
+
+	@keyframes scarf-dismiss {
+		0% {
+			top: 100svh;
+			left: 50%;
+			width: min(calc(100vw - 1rem), 30rem);
+			clip-path: inset(0);
+			opacity: 1;
+			filter:
+				drop-shadow(0.15rem 0.55rem 0.38rem rgb(0 0 0 / 40%))
+				saturate(0.96);
+			transform: translate(-50%, -80%) rotate(720deg) scale(1);
+		}
+		24% {
+			top: 88svh;
+			left: 47%;
+			clip-path: inset(0 round 0.5rem);
+			transform: translate(-50%, -50%) rotate(704deg) scale(1.12);
+		}
+		52% {
+			top: 65svh;
+			left: 56%;
+			clip-path: inset(0 round 1rem);
+			filter:
+				drop-shadow(0 1rem 0.8rem rgb(0 0 0 / 34%))
+				saturate(1.12);
+			transform: translate(-50%, -50%) rotate(815deg) scale(1.55);
+		}
+		76% {
+			top: 45svh;
+			left: 44%;
+			clip-path: inset(0 round 1.5rem);
+			opacity: 1;
+			filter:
+				drop-shadow(0 1.7rem 1.3rem rgb(0 0 0 / 30%))
+				blur(0.04rem)
+				saturate(1.22);
+			transform: translate(-50%, -50%) rotate(1010deg) scale(2.8);
+		}
+		100% {
+			top: 35svh;
+			left: 50%;
+			opacity: 0;
+			filter: blur(1.25rem) brightness(1.25) saturate(1.15);
+			transform: translate(-50%, -50%) rotate(1260deg) scale(8);
+		}
+	}
+
+	@keyframes scarf-wave {
+		0%,
+		100% {
+			transform: perspective(42rem) rotateY(0) rotate(0) skewY(0);
+		}
+		18% {
+			transform: perspective(42rem) rotateY(2.2deg) rotate(0.45deg) skewY(0.65deg);
+		}
+		42% {
+			transform: perspective(42rem) rotateY(-1.7deg) rotate(-0.35deg) skewY(-0.5deg);
+		}
+		67% {
+			transform: perspective(42rem) rotateY(2.6deg) rotate(0.55deg) skewY(0.75deg);
+		}
+		84% {
+			transform: perspective(42rem) rotateY(-0.9deg) rotate(-0.2deg) skewY(-0.3deg);
 		}
 	}
 </style>
