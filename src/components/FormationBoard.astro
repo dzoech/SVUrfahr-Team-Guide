@@ -6,16 +6,16 @@ const positions = [
 		pitchLabel: 'Sturm',
 		label: 'Sturm',
 		possession: { x: 50, y: 23 },
-		defending: { x: 50, y: 43 },
+		defending: { x: 50, y: 38 },
 		heatmap: [
 			{ x: 50, y: 21, width: 62, height: 38, rotate: 0 },
 		],
 		responsibility:
 			'Du bist die vorderste Anspielstation, beschäftigst die gegnerische Abwehr und startest unser Pressing.',
 		offense:
-			'Bleib zunächst hoch und zentral. Laufe in freie Räume hinter der Abwehr oder komm dem Ball kurz entgegen. Vor dem Tor ziehst du entschlossen zum Abschluss.',
+			'Bleib zunächst hoch und zentral. Laufe in freie Räume hinter der Abwehr – das nennen wir „in die Tiefe gehen“ – oder komm dem Ball kurz entgegen. Vor dem Tor ziehst du entschlossen zum Abschluss.',
 		defense:
-			'Falle in unsere erste Dreierlinie zurück und ordne dich zwischen LF und RF ein. Gemeinsam schließt ihr zentrale Passwege und lenkt den Spielaufbau auf eine Seite.',
+			'Bleib etwas vor LF und RF. Schließe den zentralen Passweg und lenke den Spielaufbau gemeinsam mit ihnen auf eine Seite.',
 	},
 	{
 		id: 'left-midfield',
@@ -30,7 +30,7 @@ const positions = [
 		responsibility:
 			'Du gibst unserem Spiel auf der linken Seite Breite, unterstützt Angriff und Verteidigung und suchst mutig das Eins-gegen-eins.',
 		offense:
-			'Geh auf der linken Seite in die Tiefe und so breit wie möglich bis an die Seitenlinie. Ist der Ball rechts, rücke Richtung zweiter Pfosten ein.',
+			'Geh auf der linken Seite in die Tiefe und so breit wie möglich bis an die Seitenlinie. Ist der Ball rechts, rücke Richtung zweiter Stange ein. Die zweite Stange ist die Stange, die weiter vom Ball entfernt ist.',
 		defense:
 			'Laufe in die erste Dreierlinie zurück und bleib links neben ST. Schließe den Weg nach außen; ist der Ball rechts, rücke mit der ganzen Linie zur Mitte.',
 	},
@@ -64,7 +64,7 @@ const positions = [
 		responsibility:
 			'Du gibst unserem Spiel auf der rechten Seite Breite, unterstützt Angriff und Verteidigung und suchst mutig das Eins-gegen-eins.',
 		offense:
-			'Geh auf der rechten Seite in die Tiefe und so breit wie möglich bis an die Seitenlinie. Ist der Ball links, rücke Richtung zweiter Pfosten ein.',
+			'Geh auf der rechten Seite in die Tiefe und so breit wie möglich bis an die Seitenlinie. Ist der Ball links, rücke Richtung zweiter Stange ein. Die zweite Stange ist die Stange, die weiter vom Ball entfernt ist.',
 		defense:
 			'Laufe in die erste Dreierlinie zurück und bleib rechts neben ST. Schließe den Weg nach außen; ist der Ball links, rücke mit der ganzen Linie zur Mitte.',
 	},
@@ -105,10 +105,10 @@ const positions = [
 	{
 		id: 'goalkeeper',
 		short: 'TW',
-		pitchLabel: 'Tor',
+		pitchLabel: 'Torwart',
 		label: 'Torwart',
 		possession: { x: 50, y: 87 },
-		defending: { x: 50, y: 82 },
+		defending: { x: 50, y: 89 },
 		heatmap: [
 			{ x: 50, y: 84, width: 58, height: 34, rotate: 0 },
 		],
@@ -131,12 +131,11 @@ const phases = [
 	{
 		id: 'defending',
 		label: 'Gegen den Ball',
-		description: 'Gegner hat den Ball',
-		explanation: 'Wir verteidigen im Mittelfeld: ST zwischen LF und RF, ZM zwischen LV und RV – kompakt, aber nicht zu tief.',
+		description: 'Der Gegner hat den Ball',
+		explanation: 'Wir verteidigen im Mittelfeld: ST vor LF und RF, ZM zwischen LV und RV – kompakt, aber nicht zu tief.',
 	},
 ];
 
-const activePosition = positions.find((position) => position.id === 'center-midfield') ?? positions[0];
 const activePhase = phases[0];
 ---
 
@@ -163,7 +162,7 @@ const activePhase = phases[0];
 		<strong>Tippe auf eine Position</strong>
 	</div>
 
-	<div class="pitch" aria-label="1-2-3-1-Aufstellung, unser Tor ist unten">
+	<div class="pitch" aria-label="2-3-1-Aufstellung, unser Tor ist unten">
 		<span class="goal opponent-goal" aria-hidden="true"></span>
 		<span class="goal own-goal" aria-hidden="true"></span>
 		<span class="halfway-line" aria-hidden="true"></span>
@@ -190,7 +189,7 @@ const activePhase = phases[0];
 		{positions.map((position) => (
 			<button
 				type="button"
-				class:list={['player-position', { active: position.id === activePosition.id }]}
+				class="player-position"
 				style={`--x: ${position.possession.x}%; --y: ${position.possession.y}%`}
 				data-position={position.id}
 				data-label={position.label}
@@ -203,7 +202,7 @@ const activePhase = phases[0];
 				data-defending-y={position.defending.y}
 				aria-label={`${position.label} auswählen`}
 				aria-controls="position-details"
-				aria-pressed={position.id === activePosition.id ? 'true' : 'false'}
+				aria-pressed="false"
 			>
 				<span>{position.short}</span>
 				<small>{position.pitchLabel}</small>
@@ -211,20 +210,27 @@ const activePhase = phases[0];
 		))}
 	</div>
 
-	<section class="position-details" id="position-details" aria-live="polite" aria-atomic="true">
+	<section
+		class="position-details"
+		id="position-details"
+		data-position-details
+		aria-live="polite"
+		aria-atomic="true"
+		hidden
+	>
 		<p class="details-eyebrow">Gewählte Position</p>
-		<h2 data-position-label>{activePosition.label}</h2>
+		<h2 data-position-label></h2>
 		<div class="detail-block responsibility">
 			<h3>Deine Aufgabe</h3>
-			<p data-position-responsibility>{activePosition.responsibility}</p>
+			<p data-position-responsibility></p>
 		</div>
 		<div class="detail-block offense">
 			<h3><span aria-hidden="true">↑</span> Mit dem Ball</h3>
-			<p data-position-offense>{activePosition.offense}</p>
+			<p data-position-offense></p>
 		</div>
 		<div class="detail-block defense">
 			<h3><span aria-hidden="true">↓</span> Gegen den Ball</h3>
-			<p data-position-defense>{activePosition.defense}</p>
+			<p data-position-defense></p>
 		</div>
 	</section>
 
@@ -246,6 +252,7 @@ const activePhase = phases[0];
 			const phaseButtons = board.querySelectorAll<HTMLButtonElement>('[data-formation-mode]');
 			const heatmapZones = board.querySelectorAll<HTMLElement>('[data-heatmap-for]');
 			const phaseExplanation = board.querySelector<HTMLElement>('[data-phase-explanation]');
+			const details = board.querySelector<HTMLElement>('[data-position-details]');
 			const label = board.querySelector<HTMLElement>('[data-position-label]');
 			const responsibility = board.querySelector<HTMLElement>('[data-position-responsibility]');
 			const offense = board.querySelector<HTMLElement>('[data-position-offense]');
@@ -307,6 +314,7 @@ const activePhase = phases[0];
 					if (responsibility) responsibility.textContent = button.dataset.responsibility ?? '';
 					if (offense) offense.textContent = button.dataset.offense ?? '';
 					if (defense) defense.textContent = button.dataset.defense ?? '';
+					if (details) details.hidden = false;
 				});
 			}
 		}
@@ -710,7 +718,11 @@ const activePhase = phases[0];
 
 	.player-position.active > span {
 		color: white;
-		background: var(--accent);
+		background: repeating-linear-gradient(
+			90deg,
+			var(--accent) 0 0.45rem,
+			var(--black) 0.45rem 0.9rem
+		);
 		transform: scale(1.14);
 	}
 
@@ -735,6 +747,10 @@ const activePhase = phases[0];
 			var(--paper);
 		background-size: 100% 1.6rem;
 		box-shadow: var(--shadow);
+	}
+
+	.position-details[hidden] {
+		display: none;
 	}
 
 	.position-details::after {

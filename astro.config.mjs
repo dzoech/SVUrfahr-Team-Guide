@@ -4,6 +4,6 @@ import { defineConfig } from 'astro/config';
 // https://astro.build/config
 export default defineConfig({
 	output: 'static',
-	site: 'https://dzoech.github.io',
-	base: '/SVUrfahr-Team-Guide',
+	site: 'https://sv-urfahr.zoechbauer.dev',
+	base: '/',
 });

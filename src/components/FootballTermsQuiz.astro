@@ -1,0 +1,914 @@
+---
+import {
+	FOOTBALL_QUIZ_GAME_LENGTH,
+	FOOTBALL_QUIZ_QUESTIONS,
+} from '../data/footballQuiz';
+
+const firstQuestion = FOOTBALL_QUIZ_QUESTIONS[0];
+const firstAnswers = [firstQuestion.correctAnswer, ...firstQuestion.wrongAnswers];
+const answerLetters = ['A', 'B', 'C', 'D'];
+const gameLength = FOOTBALL_QUIZ_GAME_LENGTH;
+---
+
+<section class="quiz-card" data-football-quiz>
+	<div class="quiz-meta">
+		<span data-question-count>Frage 1 von {gameLength}</span>
+		<span class="score-counter">Punkte <strong data-score>0</strong></span>
+		<span class="hold-badge" data-hold-badge><i aria-hidden="true"></i> Gedrückt halten</span>
+	</div>
+
+	<div class="question-sheet" data-question-sheet>
+		<p>Fußballbegriff</p>
+		<h2>Was bedeutet <mark data-question-term>{firstQuestion.term}</mark>?</h2>
+	</div>
+
+	<div class="answer-grid" data-answer-grid role="group" aria-label="Antwortmöglichkeiten">
+		{firstAnswers.map((answer, index) => (
+			<button
+				type="button"
+				class="answer-button"
+				data-answer-index={index}
+				aria-label={`${answerLetters[index]}: ${answer}. Gedrückt halten, um diese Antwort auszuwählen.`}
+			>
+				<span class="answer-letter" aria-hidden="true">{answerLetters[index]}</span>
+				<span class="answer-text">{answer}</span>
+			</button>
+		))}
+	</div>
+
+	<p class="hold-hint" data-hold-hint>
+		Halte eine Antwort gedrückt, bis das Farbfeld ganz gefüllt ist.
+	</p>
+
+	<div class="quiz-result" data-quiz-result role="status" aria-live="polite" hidden>
+		<strong data-result-title></strong>
+		<p data-result-explanation></p>
+	</div>
+
+	<section class="final-score" data-final-score aria-live="polite" hidden>
+		<span class="score-star" aria-hidden="true">★</span>
+		<p>Spiel beendet</p>
+		<h2><strong data-final-score-value>0</strong> von {gameLength}</h2>
+		<div data-final-score-message></div>
+	</section>
+
+	<button type="button" class="next-question" data-next-question hidden>Nächste Frage →</button>
+
+	<div class="fireworks" data-fireworks aria-hidden="true"></div>
+	<script
+		type="application/json"
+		data-quiz-questions
+		is:inline
+		set:html={JSON.stringify(FOOTBALL_QUIZ_QUESTIONS)}
+	></script>
+</section>
+
+<script>
+	interface QuizQuestion {
+		term: string;
+		correctAnswer: string;
+		wrongAnswers: string[];
+		explanation: string;
+	}
+
+	interface GameQuestion extends QuizQuestion {
+		answers: string[];
+		correctIndex: number;
+	}
+
+	const HOLD_DURATION_MS = 900;
+	const GAME_LENGTH = 11;
+	const ANSWER_LETTERS = ['A', 'B', 'C', 'D'];
+
+	function requireQuizElement<T extends Element>(element: T | null, selector: string): T {
+		if (!element) {
+			throw new Error(`The football quiz element ${selector} is missing.`);
+		}
+
+		return element;
+	}
+
+	function isQuizQuestion(value: unknown): value is QuizQuestion {
+		if (typeof value !== 'object' || value === null) return false;
+
+		const question = value as Partial<QuizQuestion>;
+
+		return (
+			typeof question.term === 'string' &&
+			typeof question.correctAnswer === 'string' &&
+			Array.isArray(question.wrongAnswers) &&
+			question.wrongAnswers.length === 3 &&
+			question.wrongAnswers.every((answer) => typeof answer === 'string') &&
+			typeof question.explanation === 'string'
+		);
+	}
+
+	function shuffle<T>(values: T[]): T[] {
+		for (let index = values.length - 1; index > 0; index -= 1) {
+			const swapIndex = Math.floor(Math.random() * (index + 1));
+			[values[index], values[swapIndex]] = [values[swapIndex], values[index]];
+		}
+
+		return values;
+	}
+
+	function createGame(questions: QuizQuestion[]): GameQuestion[] {
+		if (questions.length < GAME_LENGTH) {
+			throw new Error(`The football quiz needs at least ${GAME_LENGTH} unique questions.`);
+		}
+
+		return shuffle([...questions])
+			.slice(0, GAME_LENGTH)
+			.map((question) => {
+				const answers = shuffle([question.correctAnswer, ...question.wrongAnswers]);
+
+				return {
+					...question,
+					answers,
+					correctIndex: answers.indexOf(question.correctAnswer),
+				};
+			});
+	}
+
+	function initializeFootballQuizzes() {
+		const quizzes = document.querySelectorAll<HTMLElement>('[data-football-quiz]');
+
+		for (const quiz of quizzes) {
+			if (quiz.dataset.initialized === 'true') continue;
+			quiz.dataset.initialized = 'true';
+
+			const questionData = requireQuizElement(
+				quiz.querySelector<HTMLScriptElement>('[data-quiz-questions]'),
+				'[data-quiz-questions]',
+			);
+			const questionCount = requireQuizElement(
+				quiz.querySelector<HTMLElement>('[data-question-count]'),
+				'[data-question-count]',
+			);
+			const scoreDisplay = requireQuizElement(
+				quiz.querySelector<HTMLElement>('[data-score]'),
+				'[data-score]',
+			);
+			const holdBadge = requireQuizElement(
+				quiz.querySelector<HTMLElement>('[data-hold-badge]'),
+				'[data-hold-badge]',
+			);
+			const questionSheet = requireQuizElement(
+				quiz.querySelector<HTMLElement>('[data-question-sheet]'),
+				'[data-question-sheet]',
+			);
+			const questionTerm = requireQuizElement(
+				quiz.querySelector<HTMLElement>('[data-question-term]'),
+				'[data-question-term]',
+			);
+			const answerGrid = requireQuizElement(
+				quiz.querySelector<HTMLElement>('[data-answer-grid]'),
+				'[data-answer-grid]',
+			);
+			const holdHint = requireQuizElement(
+				quiz.querySelector<HTMLElement>('[data-hold-hint]'),
+				'[data-hold-hint]',
+			);
+			const result = requireQuizElement(
+				quiz.querySelector<HTMLElement>('[data-quiz-result]'),
+				'[data-quiz-result]',
+			);
+			const resultTitle = requireQuizElement(
+				quiz.querySelector<HTMLElement>('[data-result-title]'),
+				'[data-result-title]',
+			);
+			const resultExplanation = requireQuizElement(
+				quiz.querySelector<HTMLElement>('[data-result-explanation]'),
+				'[data-result-explanation]',
+			);
+			const nextButton = requireQuizElement(
+				quiz.querySelector<HTMLButtonElement>('[data-next-question]'),
+				'[data-next-question]',
+			);
+			const finalScore = requireQuizElement(
+				quiz.querySelector<HTMLElement>('[data-final-score]'),
+				'[data-final-score]',
+			);
+			const finalScoreValue = requireQuizElement(
+				quiz.querySelector<HTMLElement>('[data-final-score-value]'),
+				'[data-final-score-value]',
+			);
+			const finalScoreMessage = requireQuizElement(
+				quiz.querySelector<HTMLElement>('[data-final-score-message]'),
+				'[data-final-score-message]',
+			);
+			const fireworks = requireQuizElement(
+				quiz.querySelector<HTMLElement>('[data-fireworks]'),
+				'[data-fireworks]',
+			);
+
+			const parsedQuestions: unknown = JSON.parse(questionData.textContent ?? '[]');
+
+			if (
+				!Array.isArray(parsedQuestions) ||
+				parsedQuestions.length < GAME_LENGTH ||
+				new Set(
+					parsedQuestions
+						.filter(isQuizQuestion)
+						.map((question) => question.term.toLocaleLowerCase('de-AT')),
+				).size !== parsedQuestions.length ||
+				!parsedQuestions.every(isQuizQuestion)
+			) {
+				throw new Error('The football quiz data is invalid.');
+			}
+
+			const questions = parsedQuestions;
+			let gameQuestions = createGame(questions);
+			let currentRoundIndex = 0;
+			let score = 0;
+			let answered = false;
+			let holdTimer: number | undefined;
+			let heldButton: HTMLButtonElement | null = null;
+
+			function cancelHold() {
+				if (holdTimer !== undefined) {
+					window.clearTimeout(holdTimer);
+					holdTimer = undefined;
+				}
+
+				heldButton?.classList.remove('holding');
+				heldButton = null;
+			}
+
+			function launchFireworks(sourceButton: HTMLButtonElement) {
+				const quizRect = quiz.getBoundingClientRect();
+				const buttonRect = sourceButton.getBoundingClientRect();
+				const originX = buttonRect.left + buttonRect.width / 2 - quizRect.left;
+				const originY = buttonRect.top + buttonRect.height / 2 - quizRect.top;
+				const colors = ['#f7c948', '#c51d24', '#2f8550', '#ffffff'];
+				const horizontalOffset = Math.min(quizRect.width * 0.2, 75);
+				const bursts = [
+					{ x: originX, y: originY, delay: 0 },
+					{
+						x: Math.max(45, originX - horizontalOffset),
+						y: Math.max(70, originY - 70),
+						delay: 320,
+					},
+					{
+						x: Math.min(quizRect.width - 45, originX + horizontalOffset),
+						y: Math.max(65, originY - 110),
+						delay: 640,
+					},
+				];
+
+				for (const [burstIndex, burst] of bursts.entries()) {
+					for (let index = 0; index < 34; index += 1) {
+						const particle = document.createElement('i');
+						const angle = (Math.PI * 2 * index) / 34 + (burstIndex % 2) * 0.09;
+						const distance = 72 + (index % 8) * 10;
+
+						particle.className = 'quiz-firework-particle';
+						particle.style.setProperty('--origin-x', `${burst.x}px`);
+						particle.style.setProperty('--origin-y', `${burst.y}px`);
+						particle.style.setProperty('--travel-x', `${Math.cos(angle) * distance}px`);
+						particle.style.setProperty('--travel-y', `${Math.sin(angle) * distance}px`);
+						particle.style.setProperty(
+							'--particle-delay',
+							`${burst.delay + (index % 5) * 24}ms`,
+						);
+						particle.style.setProperty(
+							'--particle-color',
+							colors[(index + burstIndex) % colors.length],
+						);
+						particle.addEventListener('animationend', () => particle.remove(), { once: true });
+						fireworks.append(particle);
+					}
+				}
+			}
+
+			function lockAnswer(button: HTMLButtonElement) {
+				cancelHold();
+				answered = true;
+
+				const selectedIndex = Number(button.dataset.answerIndex);
+				const question = gameQuestions[currentRoundIndex];
+
+				if (!Number.isInteger(selectedIndex) || !question) {
+					throw new Error('The selected football quiz answer is invalid.');
+				}
+
+				const answerButtons =
+					answerGrid.querySelectorAll<HTMLButtonElement>('[data-answer-index]');
+				const correctButton = answerButtons.item(question.correctIndex);
+				const isCorrect = selectedIndex === question.correctIndex;
+
+				for (const answerButton of answerButtons) {
+					answerButton.setAttribute('aria-disabled', 'true');
+				}
+
+				button.classList.add(isCorrect ? 'correct' : 'wrong');
+
+				if (!isCorrect) {
+					correctButton?.classList.add('correct-answer');
+				} else {
+					score += 1;
+					scoreDisplay.textContent = String(score);
+				}
+
+				result.classList.toggle('correct-result', isCorrect);
+				result.classList.toggle('wrong-result', !isCorrect);
+				resultTitle.textContent = isCorrect ? 'Richtig!' : 'Noch nicht ganz.';
+				resultExplanation.textContent = isCorrect
+					? question.explanation
+					: `Richtig wäre: „${question.answers[question.correctIndex]}“ ${question.explanation}`;
+				result.hidden = false;
+				holdHint.hidden = true;
+				nextButton.hidden = false;
+				nextButton.textContent =
+					currentRoundIndex === GAME_LENGTH - 1 ? 'Ergebnis ansehen →' : 'Nächste Frage →';
+
+				if (isCorrect) {
+					launchFireworks(button);
+				}
+			}
+
+			function startHold(button: HTMLButtonElement) {
+				if (answered || button.disabled) return;
+
+				cancelHold();
+				heldButton = button;
+				button.classList.add('holding');
+				holdTimer = window.setTimeout(() => lockAnswer(button), HOLD_DURATION_MS);
+			}
+
+			function connectAnswerButton(button: HTMLButtonElement) {
+				button.addEventListener('pointerdown', (event) => {
+					if (!event.isPrimary || (event.pointerType === 'mouse' && event.button !== 0)) return;
+
+					event.preventDefault();
+					button.setPointerCapture(event.pointerId);
+					startHold(button);
+				});
+				button.addEventListener('pointerup', cancelHold);
+				button.addEventListener('pointercancel', cancelHold);
+				button.addEventListener('lostpointercapture', cancelHold);
+				button.addEventListener('contextmenu', (event) => event.preventDefault());
+				button.addEventListener('click', (event) => event.preventDefault());
+				button.addEventListener('keydown', (event) => {
+					if ((event.key === ' ' || event.key === 'Enter') && !event.repeat) {
+						event.preventDefault();
+						startHold(button);
+					}
+				});
+				button.addEventListener('keyup', (event) => {
+					if (event.key === ' ' || event.key === 'Enter') {
+						event.preventDefault();
+						cancelHold();
+					}
+				});
+				button.addEventListener('blur', cancelHold);
+			}
+
+			function createAnswerButton(answer: string, index: number) {
+				const button = document.createElement('button');
+				const letter = document.createElement('span');
+				const answerText = document.createElement('span');
+
+				button.type = 'button';
+				button.className = 'answer-button';
+				button.dataset.answerIndex = String(index);
+				button.setAttribute(
+					'aria-label',
+					`${ANSWER_LETTERS[index]}: ${answer}. Gedrückt halten, um diese Antwort auszuwählen.`,
+				);
+				letter.className = 'answer-letter';
+				letter.setAttribute('aria-hidden', 'true');
+				letter.textContent = ANSWER_LETTERS[index];
+				answerText.className = 'answer-text';
+				answerText.textContent = answer;
+				button.append(letter, answerText);
+				connectAnswerButton(button);
+
+				return button;
+			}
+
+			function renderQuestion(roundIndex: number) {
+				const question = gameQuestions[roundIndex];
+
+				if (!question) {
+					throw new Error('The requested football quiz question does not exist.');
+				}
+
+				cancelHold();
+				answered = false;
+				currentRoundIndex = roundIndex;
+				questionCount.textContent = `Frage ${roundIndex + 1} von ${GAME_LENGTH}`;
+				questionTerm.textContent = question.term;
+				questionSheet.hidden = false;
+				answerGrid.hidden = false;
+				answerGrid.replaceChildren(
+					...question.answers.map((answer, answerIndex) =>
+						createAnswerButton(answer, answerIndex),
+					),
+				);
+				result.hidden = true;
+				result.classList.remove('correct-result', 'wrong-result');
+				resultTitle.textContent = '';
+				resultExplanation.textContent = '';
+				holdHint.hidden = false;
+				nextButton.hidden = true;
+				holdBadge.hidden = false;
+				finalScore.hidden = true;
+				fireworks.replaceChildren();
+			}
+
+			function showFinalScore() {
+				cancelHold();
+				questionCount.textContent = 'Spiel beendet';
+				questionSheet.hidden = true;
+				answerGrid.hidden = true;
+				holdHint.hidden = true;
+				holdBadge.hidden = true;
+				result.hidden = true;
+				finalScoreValue.textContent = String(score);
+				finalScoreMessage.textContent =
+					score === GAME_LENGTH
+						? 'Perfektes Spiel – alle Begriffe sitzen!'
+						: score >= 9
+							? 'Starke Leistung – du kennst den Fußball-Code!'
+							: score >= 6
+								? 'Gut gespielt – mit etwas Übung wird es noch besser.'
+								: 'Dranbleiben – beim nächsten Spiel holst du mehr Punkte.';
+				finalScore.hidden = false;
+				nextButton.textContent = 'Neues Spiel starten ↻';
+				nextButton.hidden = false;
+			}
+
+			function startNewGame() {
+				gameQuestions = createGame(questions);
+				score = 0;
+				scoreDisplay.textContent = '0';
+				renderQuestion(0);
+			}
+
+			nextButton.addEventListener('click', () => {
+				if (!finalScore.hidden) {
+					startNewGame();
+				} else if (currentRoundIndex === GAME_LENGTH - 1) {
+					showFinalScore();
+				} else {
+					renderQuestion(currentRoundIndex + 1);
+				}
+
+				quiz.scrollIntoView({
+					behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches
+						? 'auto'
+						: 'smooth',
+					block: 'start',
+				});
+			});
+
+			startNewGame();
+		}
+	}
+
+	initializeFootballQuizzes();
+	document.addEventListener('astro:page-load', initializeFootballQuizzes);
+</script>
+
+<style is:global>
+	.quiz-card {
+		position: relative;
+		display: grid;
+		gap: 0.9rem;
+		padding: 1rem;
+		border-top: 0.45rem solid var(--accent);
+		border-radius: 0.4rem;
+		background:
+			linear-gradient(rgb(30 30 30 / 5%) 1px, transparent 1px),
+			var(--paper);
+		background-size: 100% 1.55rem;
+		box-shadow: var(--shadow);
+		overflow: clip;
+		overflow-anchor: none;
+	}
+
+	.quiz-meta {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) auto;
+		min-height: 2.9rem;
+		align-items: center;
+		gap: 0.4rem 0.6rem;
+		color: var(--muted);
+		font-size: 0.68rem;
+		font-weight: 900;
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
+	}
+
+	.score-counter {
+		display: inline-flex;
+		min-width: 5.4rem;
+		padding: 0.25rem 0.5rem;
+		align-items: baseline;
+		justify-content: space-between;
+		gap: 0.3rem;
+		border-radius: 999px;
+		color: white;
+		background: var(--black);
+		letter-spacing: 0.04em;
+	}
+
+	.score-counter strong {
+		display: inline-block;
+		width: 1.25rem;
+		color: #f4c542;
+		font-size: 0.9rem;
+		font-variant-numeric: tabular-nums;
+		text-align: center;
+	}
+
+	.hold-badge {
+		display: inline-flex;
+		grid-column: 1 / -1;
+		align-items: center;
+		justify-self: end;
+		gap: 0.3rem;
+		text-align: right;
+	}
+
+	.hold-badge i {
+		display: block;
+		width: 0.65rem;
+		height: 0.65rem;
+		border: 0.12rem solid #bd8f08;
+		border-radius: 50%;
+		box-shadow: inset 0.22rem 0 0 #f4c542;
+	}
+
+	.question-sheet {
+		position: relative;
+		display: grid;
+		height: 9rem;
+		padding: 1rem 0.9rem 1.1rem;
+		align-content: center;
+		border-radius: 0.35rem;
+		color: white;
+		background: var(--black);
+		box-shadow: 0 0.35rem 0.75rem rgb(0 0 0 / 22%);
+	}
+
+	.question-sheet[hidden],
+	.answer-grid[hidden],
+	.hold-badge[hidden] {
+		display: none;
+	}
+
+	.question-sheet::after {
+		content: "";
+		position: absolute;
+		top: -0.4rem;
+		right: 1rem;
+		width: 3.4rem;
+		height: 0.8rem;
+		background: rgb(235 224 213 / 72%);
+		transform: rotate(2deg);
+	}
+
+	.question-sheet p {
+		margin: 0 0 0.45rem;
+		color: #ff8589;
+		font-size: 0.65rem;
+		font-weight: 950;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+	}
+
+	.question-sheet h2 {
+		margin: 0;
+		font-family: ui-rounded, "Arial Rounded MT Bold", sans-serif;
+		font-size: clamp(1.25rem, 6vw, 1.65rem);
+		line-height: 1.35;
+	}
+
+	.question-sheet mark {
+		padding: 0.08em 0.2em;
+		border-radius: 0.15em;
+		color: white;
+		background: var(--accent);
+		box-decoration-break: clone;
+		-webkit-box-decoration-break: clone;
+	}
+
+	.answer-grid {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 0.65rem;
+	}
+
+	.answer-button {
+		position: relative;
+		display: grid;
+		min-width: 0;
+		min-height: 8.3rem;
+		padding: 0.75rem 0.7rem;
+		align-content: start;
+		gap: 0.55rem;
+		border: 0.13rem solid #d9d0bf;
+		border-radius: 0.5rem;
+		color: var(--ink);
+		background: rgb(255 255 255 / 88%);
+		box-shadow: 0 0.2rem 0.45rem rgb(0 0 0 / 12%);
+		cursor: pointer;
+		overflow: hidden;
+		text-align: left;
+		touch-action: pan-y;
+		-webkit-touch-callout: none;
+		user-select: none;
+	}
+
+	.answer-button::before {
+		content: "";
+		position: absolute;
+		z-index: 0;
+		inset: 0 auto 0 0;
+		width: 0;
+		background: #f4c542;
+	}
+
+	.answer-button.holding::before {
+		animation: hold-to-answer 900ms linear forwards;
+	}
+
+	.answer-button > span {
+		position: relative;
+		z-index: 1;
+	}
+
+	.answer-letter {
+		display: grid;
+		width: 1.65rem;
+		height: 1.65rem;
+		place-items: center;
+		border-radius: 50%;
+		color: white;
+		background: var(--black);
+		font-size: 0.72rem;
+		font-weight: 950;
+	}
+
+	.answer-text {
+		font-size: 0.78rem;
+		font-weight: 750;
+		line-height: 1.38;
+		overflow-wrap: anywhere;
+	}
+
+	.answer-button:focus-visible {
+		outline: 0.2rem solid #f4c542;
+		outline-offset: 0.12rem;
+	}
+
+	.answer-button:disabled,
+	.answer-button[aria-disabled="true"] {
+		cursor: default;
+		opacity: 1;
+	}
+
+	.answer-button.correct,
+	.answer-button.wrong {
+		color: white;
+	}
+
+	.answer-button.correct::before,
+	.answer-button.wrong::before,
+	.answer-button.correct-answer::before {
+		display: none;
+	}
+
+	.answer-button.correct {
+		border-color: #1e6b3e;
+		background: #2f8550;
+		box-shadow:
+			0 0 0 0.18rem rgb(47 133 80 / 24%),
+			0 0.25rem 0.55rem rgb(0 0 0 / 18%);
+	}
+
+	.answer-button.wrong {
+		border-color: #8f1117;
+		background: var(--accent);
+	}
+
+	.answer-button.correct .answer-letter,
+	.answer-button.wrong .answer-letter {
+		color: var(--ink);
+		background: white;
+	}
+
+	.answer-button.correct-answer {
+		border-color: #23824a;
+		background: #f1fff5;
+		box-shadow:
+			inset 0 0 0 0.15rem #2f9a5b,
+			0 0.2rem 0.45rem rgb(0 0 0 / 12%);
+	}
+
+	.answer-button.correct-answer .answer-letter {
+		background: #2f8550;
+	}
+
+	.hold-hint {
+		padding: 0.6rem 0.7rem;
+		margin: 0;
+		border: 1px dashed #cabc9f;
+		border-radius: 0.35rem;
+		color: var(--muted);
+		background: #fff7d4;
+		font-size: 0.75rem;
+		font-weight: 750;
+		line-height: 1.4;
+		text-align: center;
+	}
+
+	.quiz-result {
+		padding: 0.8rem 0.85rem;
+		border-left: 0.3rem solid;
+		border-radius: 0.35rem;
+	}
+
+	.quiz-result[hidden] {
+		display: none;
+	}
+
+	.quiz-result.correct-result {
+		border-color: #2f8550;
+		color: #17472c;
+		background: #eaf8ee;
+	}
+
+	.quiz-result.wrong-result {
+		border-color: var(--accent);
+		color: #6f1115;
+		background: #fff0f0;
+	}
+
+	.quiz-result strong {
+		font-family: ui-rounded, "Arial Rounded MT Bold", sans-serif;
+		font-size: 1rem;
+	}
+
+	.quiz-result p {
+		margin: 0.25rem 0 0;
+		font-size: 0.8rem;
+		line-height: 1.45;
+	}
+
+	.final-score {
+		display: grid;
+		min-height: 19rem;
+		padding: 1.5rem 1rem;
+		place-content: center;
+		place-items: center;
+		border: 0.25rem solid #f4c542;
+		border-radius: 0.5rem;
+		color: white;
+		background:
+			radial-gradient(circle at 50% 25%, rgb(197 29 36 / 55%), transparent 38%),
+			var(--black);
+		box-shadow:
+			inset 0 0 0 0.18rem rgb(255 255 255 / 10%),
+			0 0.4rem 0.8rem rgb(0 0 0 / 24%);
+		text-align: center;
+	}
+
+	.final-score[hidden] {
+		display: none;
+	}
+
+	.score-star {
+		color: #f4c542;
+		font-size: 3.2rem;
+		line-height: 1;
+		text-shadow: 0 0 1rem rgb(244 197 66 / 62%);
+	}
+
+	.final-score p {
+		margin: 0.55rem 0 0;
+		color: #ffb3b6;
+		font-size: 0.68rem;
+		font-weight: 950;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+	}
+
+	.final-score h2 {
+		margin: 0.25rem 0 0.65rem;
+		font-family: ui-rounded, "Arial Rounded MT Bold", sans-serif;
+		font-size: 1.35rem;
+	}
+
+	.final-score h2 strong {
+		color: #f4c542;
+		font-size: 3rem;
+		line-height: 1;
+	}
+
+	.final-score div {
+		max-width: 17rem;
+		color: rgb(255 255 255 / 82%);
+		font-size: 0.88rem;
+		font-weight: 750;
+		line-height: 1.45;
+	}
+
+	.next-question {
+		min-height: 3.2rem;
+		padding: 0.7rem 1rem;
+		border: 0;
+		border-radius: 0.45rem;
+		color: white;
+		background: var(--black);
+		box-shadow: 0 0.25rem 0.5rem rgb(0 0 0 / 20%);
+		font-size: 0.84rem;
+		font-weight: 900;
+		cursor: pointer;
+	}
+
+	.fireworks {
+		position: absolute;
+		z-index: 8;
+		inset: 0;
+		contain: paint;
+		overflow: clip;
+		pointer-events: none;
+	}
+
+	.quiz-firework-particle {
+		position: absolute;
+		top: var(--origin-y);
+		left: var(--origin-x);
+		width: 0.52rem;
+		height: 0.52rem;
+		border-radius: 50%;
+		background: var(--particle-color);
+		box-shadow:
+			0 0 0.35rem var(--particle-color),
+			0 0 0.7rem var(--particle-color);
+		opacity: 0;
+		animation: quiz-firework 1600ms cubic-bezier(0.18, 0.7, 0.3, 1) var(--particle-delay)
+			forwards;
+	}
+
+	.quiz-firework-particle:nth-child(3n) {
+		width: 0.32rem;
+		height: 0.8rem;
+		border-radius: 0.1rem;
+	}
+
+	@keyframes hold-to-answer {
+		from {
+			width: 0;
+		}
+		to {
+			width: 100%;
+		}
+	}
+
+	@keyframes quiz-firework {
+		0% {
+			opacity: 1;
+			transform: translate(-50%, -50%) scale(0.35);
+		}
+		78% {
+			opacity: 1;
+		}
+		100% {
+			opacity: 0;
+			transform: translate(
+					calc(-50% + var(--travel-x)),
+					calc(-50% + var(--travel-y))
+				)
+				rotate(220deg) scale(1);
+		}
+	}
+
+	@media (max-width: 22rem) {
+		.quiz-card {
+			padding: 0.8rem;
+		}
+
+		.answer-grid {
+			gap: 0.5rem;
+		}
+
+		.answer-button {
+			min-height: 8.7rem;
+			padding: 0.65rem 0.55rem;
+		}
+
+		.answer-text {
+			font-size: 0.73rem;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.quiz-firework-particle {
+			display: none;
+		}
+	}
+</style>

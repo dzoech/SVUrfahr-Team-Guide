@@ -127,7 +127,7 @@ const timeFormatter = new Intl.DateTimeFormat('de-AT', {
 
 		<nav class="desk-menu" aria-label="Bereiche der Mannschaftsmappe">
 			<a class="menu-card calendar-card" href={pagePath('termine')} style="--order: 0">
-				<span class="card-label">Nächster Termin</span>
+				<span class="card-label">Nächstes Match</span>
 				{nextEvent ? (
 					<>
 						<span class="calendar-date">
@@ -184,19 +184,25 @@ const timeFormatter = new Intl.DateTimeFormat('de-AT', {
 				<span class="card-action">Taktiktafel öffnen →</span>
 			</a>
 
-			<a class="menu-card index-card" href={pagePath('faq')} style="--order: 6">
+			<a class="menu-card quiz-link-card" href={pagePath('fussballbegriffe')} style="--order: 6">
+				<span class="object-mark quiz-mark" aria-hidden="true">ABC</span>
+				<span class="card-title">Fußballbegriffe-Quiz</span>
+				<span class="card-action">Quiz starten →</span>
+			</a>
+
+			<a class="menu-card index-card" href={pagePath('faq')} style="--order: 7">
 				<span class="object-mark" aria-hidden="true">?</span>
 				<span class="card-title">Häufige Fragen</span>
 				<span class="card-action">Antworten →</span>
 			</a>
 
-			<a class="menu-card note-card" href={pagePath('kontakt')} style="--order: 7">
+			<a class="menu-card note-card" href={pagePath('kontakt')} style="--order: 8">
 				<span class="object-mark" aria-hidden="true">i</span>
 				<span class="card-title">Kontakt</span>
 				<span class="card-action">Öffnen →</span>
 			</a>
 
-			<a class="new-team-link" href={pagePath('neu-im-team')} style="--order: 8">
+			<a class="new-team-link" href={pagePath('neu-im-team')} style="--order: 9">
 				<span>
 					<strong>Neu im Team?</strong>
 					<small>Hier geht es zur einmaligen Start-Checkliste.</small>
@@ -1136,6 +1142,40 @@ const timeFormatter = new Intl.DateTimeFormat('de-AT', {
 
 	.formation-card .card-action {
 		color: #e7f7eb;
+	}
+
+	.quiz-link-card {
+		border-top: 0.55rem solid var(--accent);
+		background:
+			linear-gradient(135deg, transparent 0 62%, rgb(197 29 36 / 9%) 62% 63%, transparent 63%),
+			#fff3bd;
+		transform: rotate(-0.45deg);
+	}
+
+	.quiz-link-card::after {
+		content: "QUIZ";
+		position: absolute;
+		top: 0.7rem;
+		right: -0.7rem;
+		padding: 0.18rem 0.85rem;
+		color: rgb(197 29 36 / 50%);
+		border: 0.12rem solid rgb(197 29 36 / 38%);
+		font-size: 0.55rem;
+		font-weight: 950;
+		letter-spacing: 0.12em;
+		transform: rotate(12deg);
+	}
+
+	.quiz-link-card .quiz-mark {
+		border-color: var(--black);
+		color: white;
+		background: repeating-linear-gradient(
+			90deg,
+			var(--accent) 0 0.4rem,
+			var(--black) 0.4rem 0.8rem
+		);
+		font-size: 0.65rem;
+		letter-spacing: -0.04em;
 	}
 
 	.note-card {
