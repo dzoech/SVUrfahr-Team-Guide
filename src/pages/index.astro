@@ -55,12 +55,14 @@ const timeFormatter = new Intl.DateTimeFormat('de-AT', {
 			const folderIntro = document.currentScript?.previousElementSibling;
 			if (folderIntro instanceof HTMLElement) {
 				const storageKey = 'sv-urfahr-guide:folder-intro-seen';
+				const skipAnimationsClass = 'home-skip-entry';
 				const openButton = folderIntro.querySelector('[data-folder-intro-open]');
 
 				if (
 					window.sessionStorage.getItem(storageKey) !== 'true' &&
 					openButton instanceof HTMLButtonElement
 				) {
+					document.documentElement.classList.remove(skipAnimationsClass);
 					document.documentElement.classList.add('folder-intro-pending');
 					folderIntro.classList.add('active');
 					openButton.addEventListener(
@@ -83,6 +85,7 @@ const timeFormatter = new Intl.DateTimeFormat('de-AT', {
 						{ once: true },
 					);
 				} else {
+					document.documentElement.classList.add(skipAnimationsClass);
 					document.documentElement.classList.remove('folder-intro-pending');
 					folderIntro.remove();
 				}
@@ -118,7 +121,7 @@ const timeFormatter = new Intl.DateTimeFormat('de-AT', {
 		}
 	</script>
 
-	<main class="home" transition:animate="slide">
+	<main class="home" transition:animate="none">
 		<header class="welcome">
 			<p>Willkommen bei der</p>
 			<h1>{SITE.title}</h1>
@@ -1254,6 +1257,26 @@ const timeFormatter = new Intl.DateTimeFormat('de-AT', {
 
 	footer button:active {
 		color: rgb(255 255 255 / 72%);
+	}
+
+	:global(html.home-skip-entry) .welcome,
+	:global(html.home-skip-entry) .menu-card,
+	:global(html.home-skip-entry) .new-team-link,
+	:global(html.home-skip-entry) .practice-card {
+		animation: none;
+	}
+
+	:global(html.home-skip-entry)
+		.team-scarf:not(.dropped):not(.dropped-resting):not(.dismissing) {
+		animation: none;
+		transform: translate(-50%, -50%) rotate(270deg);
+	}
+
+	:global(html.home-skip-entry)
+		.team-scarf:not(.dropped):not(.dropped-resting):not(.dismissing)
+		img {
+		clip-path: inset(0);
+		animation: scarf-wave 6.5s linear infinite;
 	}
 
 	@keyframes desk-drop {
