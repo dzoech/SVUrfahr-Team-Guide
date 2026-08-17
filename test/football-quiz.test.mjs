@@ -13,6 +13,17 @@ function findQuestion(term) {
 	return question;
 }
 
+function getQuestionSentence(term) {
+	const question = findQuestion(term);
+	const prompt = question.context
+		? `${question.prompt.charAt(0).toLocaleLowerCase('de-AT')}${question.prompt.slice(1)}`
+		: question.prompt;
+
+	return [question.context ? `${question.context},` : null, prompt, `${question.term}?`]
+		.filter(Boolean)
+		.join(' ');
+}
+
 test('provides enough questions for the balanced eleven-question game', () => {
 	const counts = Object.groupBy(
 		FOOTBALL_QUIZ_QUESTIONS,
@@ -38,38 +49,21 @@ test('uses unique terms and four distinct answers per question', () => {
 	}
 });
 
-test('limits prompts and contexts to the supported wording', () => {
-	const prompts = new Set(FOOTBALL_QUIZ_QUESTIONS.map((question) => question.prompt));
-	const contexts = new Set(
-		FOOTBALL_QUIZ_QUESTIONS.flatMap((question) =>
-			question.context ? [question.context] : [],
-		),
+test('builds the complete requested question sentences', () => {
+	assert.equal(
+		getQuestionSentence('hinter den Ball kommen'),
+		'Beim Verteidigen, was bedeutet hinter den Ball kommen?',
 	);
-
-	assert.deepEqual(prompts, new Set(['Was ist', 'Was bedeutet']));
-	assert.deepEqual(contexts, new Set(['Beim Verteidigen', 'Beim Angreifen']));
-});
-
-test('adds context to the defending and attacking examples', () => {
-	assert.deepEqual(
-		{
-			context: findQuestion('hinter den Ball kommen').context,
-			prompt: findQuestion('hinter den Ball kommen').prompt,
-		},
-		{
-			context: 'Beim Verteidigen',
-			prompt: 'Was bedeutet',
-		},
+	assert.equal(
+		getQuestionSentence('ein Abschluss'),
+		'Beim Angreifen, was ist ein Abschluss?',
 	);
-	assert.deepEqual(
-		{
-			context: findQuestion('ein Abschluss').context,
-			prompt: findQuestion('ein Abschluss').prompt,
-		},
-		{
-			context: 'Beim Angreifen',
-			prompt: 'Was ist',
-		},
+	assert.equal(
+		getQuestionSentence('eine Abseitsfalle'),
+		'Was ist eine Abseitsfalle?',
 	);
-	assert.equal(findQuestion('eine Abseitsfalle').prompt, 'Was ist');
+	assert.equal(getQuestionSentence('die lange Ecke'), 'Was ist die lange Ecke?');
+	assert.equal(getQuestionSentence('ein Corner'), 'Was ist ein Corner?');
+	assert.equal(getQuestionSentence('ein Stanglpass'), 'Was ist ein Stanglpass?');
+	assert.equal(getQuestionSentence('Pressing'), 'Was ist Pressing?');
 });
