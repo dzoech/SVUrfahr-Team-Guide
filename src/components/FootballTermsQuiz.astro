@@ -19,7 +19,10 @@ const gameLength = FOOTBALL_QUIZ_GAME_LENGTH;
 
 	<div class="question-sheet" data-question-sheet>
 		<p>Fußballbegriff</p>
-		<h2>Was bedeutet <mark data-question-term>{firstQuestion.term}</mark>?</h2>
+		<h2>
+			<span data-question-prompt>{firstQuestion.prompt}</span>
+			<mark data-question-term>{firstQuestion.term}</mark>?
+		</h2>
 	</div>
 
 	<div class="answer-grid" data-answer-grid role="group" aria-label="Antwortmöglichkeiten">
@@ -66,6 +69,7 @@ const gameLength = FOOTBALL_QUIZ_GAME_LENGTH;
 <script>
 	interface QuizQuestion {
 		term: string;
+		prompt: 'Was ist' | 'Was bedeutet';
 		difficulty: 'easy' | 'medium' | 'hard';
 		correctAnswer: string;
 		wrongAnswers: string[];
@@ -99,7 +103,7 @@ const gameLength = FOOTBALL_QUIZ_GAME_LENGTH;
 		hard: 2,
 	} satisfies Record<QuizQuestion['difficulty'], number>;
 	const ANSWER_LETTERS = ['A', 'B', 'C', 'D'];
-	const PROGRESS_STORAGE_KEY = 'svurfahr-football-quiz-progress-v2';
+	const PROGRESS_STORAGE_KEY = 'svurfahr-football-quiz-progress-v3';
 
 	function requireQuizElement<T extends Element>(element: T | null, selector: string): T {
 		if (!element) {
@@ -116,6 +120,7 @@ const gameLength = FOOTBALL_QUIZ_GAME_LENGTH;
 
 		return (
 			typeof question.term === 'string' &&
+			(question.prompt === 'Was ist' || question.prompt === 'Was bedeutet') &&
 			(question.difficulty === 'easy' ||
 				question.difficulty === 'medium' ||
 				question.difficulty === 'hard') &&
@@ -217,6 +222,10 @@ const gameLength = FOOTBALL_QUIZ_GAME_LENGTH;
 			const questionTerm = requireQuizElement(
 				quiz.querySelector<HTMLElement>('[data-question-term]'),
 				'[data-question-term]',
+			);
+			const questionPrompt = requireQuizElement(
+				quiz.querySelector<HTMLElement>('[data-question-prompt]'),
+				'[data-question-prompt]',
 			);
 			const answerGrid = requireQuizElement(
 				quiz.querySelector<HTMLElement>('[data-answer-grid]'),
@@ -664,6 +673,7 @@ const gameLength = FOOTBALL_QUIZ_GAME_LENGTH;
 				answered = false;
 				currentRoundIndex = roundIndex;
 				questionCount.textContent = `Frage ${roundIndex + 1} von ${GAME_LENGTH}`;
+				questionPrompt.textContent = question.prompt;
 				questionTerm.textContent = question.term;
 				questionSheet.hidden = false;
 				answerGrid.hidden = false;
