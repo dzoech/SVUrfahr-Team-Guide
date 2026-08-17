@@ -2,11 +2,8 @@ export type FootballQuizDifficulty = 'easy' | 'medium' | 'hard';
 
 export interface FootballQuizQuestion {
 	term: string;
-	prompt:
-		| 'Was ist'
-		| 'Was bedeutet'
-		| 'Beim Verteidigen, was bedeutet'
-		| 'Beim Angreifen, was ist';
+	context?: 'Beim Verteidigen' | 'Beim Angreifen';
+	prompt: 'Was ist' | 'Was bedeutet';
 	difficulty: FootballQuizDifficulty;
 	correctAnswer: string;
 	wrongAnswers: [string, string, string];
@@ -18,7 +15,8 @@ export const FOOTBALL_QUIZ_GAME_LENGTH = 11;
 export const FOOTBALL_QUIZ_QUESTIONS = [
 	{
 		term: 'hinter den Ball kommen',
-		prompt: 'Beim Verteidigen, was bedeutet',
+		context: 'Beim Verteidigen',
+		prompt: 'Was bedeutet',
 		difficulty: 'medium',
 		correctAnswer: 'Nach einem Ballverlust schnell zurücklaufen und das eigene Tor schützen.',
 		wrongAnswers: [
@@ -367,7 +365,8 @@ export const FOOTBALL_QUIZ_QUESTIONS = [
 	},
 	{
 		term: 'ein Abschluss',
-		prompt: 'Beim Angreifen, was ist',
+		context: 'Beim Angreifen',
+		prompt: 'Was ist',
 		difficulty: 'easy',
 		correctAnswer: 'Die letzte Aktion eines Angriffs, meistens ein Torschuss.',
 		wrongAnswers: [
