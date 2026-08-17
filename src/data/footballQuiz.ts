@@ -1,5 +1,8 @@
+export type FootballQuizDifficulty = 'easy' | 'medium' | 'hard';
+
 export interface FootballQuizQuestion {
 	term: string;
+	difficulty: FootballQuizDifficulty;
 	correctAnswer: string;
 	wrongAnswers: [string, string, string];
 	explanation: string;
@@ -10,440 +13,418 @@ export const FOOTBALL_QUIZ_GAME_LENGTH = 11;
 export const FOOTBALL_QUIZ_QUESTIONS = [
 	{
 		term: 'hinter den Ball kommen',
-		correctAnswer:
-			'Nach einem Ballverlust zurücklaufen und sich zwischen Ball und eigenem Tor positionieren.',
+		difficulty: 'medium',
+		correctAnswer: 'Nach einem Ballverlust schnell zurücklaufen und das eigene Tor schützen.',
 		wrongAnswers: [
-			'Beim Angriff hinter dem Mitspieler mit Ball warten.',
-			'Dem Ball überallhin folgen, auch wenn die eigene Position frei bleibt.',
-			'Den Ball zurück zum Torwart spielen.',
+			'Hinter dem Mitspieler mit Ball stehen bleiben.',
+			'Dem Ball überall auf dem Feld folgen.',
+			'Den Ball immer zum Torwart zurückspielen.',
 		],
 		explanation:
-			'Wer hinter den Ball kommt, schützt zuerst das eigene Tor und kann gemeinsam mit dem Team verteidigen.',
+			'Nach einem Ballverlust läufst du zurück, bis du zwischen Ball und eigenem Tor bist.',
 	},
 	{
 		term: 'in die Tiefe gehen',
-		correctAnswer: 'In einen freien Raum hinter der gegnerischen Abwehr starten.',
+		difficulty: 'medium',
+		correctAnswer: 'In den freien Raum hinter der gegnerischen Abwehr laufen.',
 		wrongAnswers: [
-			'Sich direkt neben den Mitspieler mit Ball stellen.',
-			'Mit dem Ball langsam zur Seitenlinie dribbeln.',
-			'In Richtung des eigenen Tores zurücklaufen.',
+			'Direkt neben dem Mitspieler mit Ball laufen.',
+			'Mit dem Ball zur Seitenlinie dribbeln.',
+			'Zum eigenen Tor zurücklaufen.',
 		],
 		explanation:
-			'Mit einem Lauf in die Tiefe nutzt du den freien Raum hinter der Abwehr und kannst dort angespielt werden.',
+			'Mit einem Lauf in die Tiefe kannst du hinter der Abwehr einen Pass bekommen.',
 	},
 	{
-		term: 'zweite Stange',
+		term: 'die zweite Stange',
+		difficulty: 'easy',
 		correctAnswer: 'Die Torstange, die weiter vom Ball entfernt ist.',
 		wrongAnswers: [
 			'Die Torstange, die näher beim Ball ist.',
-			'Die Mittellinie zwischen den beiden Toren.',
-			'Die Eckfahne auf der Seite des Balles.',
+			'Die Eckfahne auf der Seite des Balls.',
+			'Die Linie in der Mitte des Spielfelds.',
 		],
-		explanation:
-			'Die zweite Stange ist immer die Torstange, die weiter vom Ball entfernt ist.',
+		explanation: 'Die zweite Stange ist immer die Torstange weiter weg vom Ball.',
 	},
 	{
 		term: 'ballnah',
-		correctAnswer: 'Auf der Seite oder in dem Raum nahe beim Ball.',
+		difficulty: 'easy',
+		correctAnswer: 'Auf der Seite, auf der gerade der Ball ist.',
 		wrongAnswers: [
-			'Möglichst weit weg vom Ball.',
-			'Direkt vor dem eigenen Tor.',
-			'Immer auf der rechten Spielfeldseite.',
+			'Auf der Seite weit weg vom Ball.',
+			'Immer direkt vor dem eigenen Tor.',
+			'Immer auf der rechten Seite.',
 		],
-		explanation:
-			'Ballnah bedeutet: auf der Seite oder in dem Raum, in dem sich der Ball gerade befindet.',
+		explanation: 'Ballnah bedeutet: nah beim Ball.',
 	},
 	{
-		term: 'Passfenster',
-		correctAnswer: 'Eine freie Lücke, durch die ein Pass gespielt werden kann.',
+		term: 'das Passfenster',
+		difficulty: 'medium',
+		correctAnswer: 'Eine freie Lücke, durch die du einen Pass spielen kannst.',
 		wrongAnswers: [
-			'Ein besonders hoher Pass über das ganze Spielfeld.',
-			'Der Bereich direkt hinter dem eigenen Tor.',
+			'Ein hoher Pass über das ganze Feld.',
+			'Der freie Raum hinter dem eigenen Tor.',
 			'Eine kurze Pause vor einem Einwurf.',
 		],
 		explanation:
-			'Ein Passfenster ist eine freie Lücke zwischen Gegenspielern, durch die dein Mitspieler dich anspielen kann.',
+			'Ein Passfenster ist eine Lücke zwischen Gegnern, durch die der Ball passt.',
 	},
 	{
 		term: 'ballfern',
-		correctAnswer: 'Auf der Seite oder in dem Raum weiter weg vom Ball.',
+		difficulty: 'easy',
+		correctAnswer: 'Auf der Seite, die weiter vom Ball entfernt ist.',
 		wrongAnswers: [
-			'Direkt beim ballführenden Gegner.',
-			'Hinter der eigenen Torlinie.',
-			'Immer auf der linken Spielfeldseite.',
+			'Direkt beim Spieler mit Ball.',
+			'Immer hinter der eigenen Torlinie.',
+			'Immer auf der linken Seite.',
 		],
-		explanation:
-			'Ballfern ist die Seite des Spielfelds, die weiter vom Ball entfernt ist – also fern vom Ball.',
+		explanation: 'Ballfern bedeutet: weiter weg vom Ball.',
 	},
 	{
 		term: 'das Feld breit machen',
-		correctAnswer:
-			'Sich mit dem Team über die ganze Spielfeldbreite verteilen, damit freie Räume entstehen.',
+		difficulty: 'medium',
+		correctAnswer: 'Sich im Angriff gut über die ganze Breite verteilen.',
 		wrongAnswers: [
-			'Alle Spieler sammeln sich eng in der Mitte.',
-			'Den Ball bei jeder Gelegenheit hoch nach vorne schießen.',
-			'Nur die beiden Verteidiger laufen nach außen.',
+			'Sich mit allen Mitspielern in der Mitte sammeln.',
+			'Jeden Ball hoch nach vorne schießen.',
+			'Nur die Verteidiger nach außen schicken.',
 		],
 		explanation:
-			'Mit dem Ball nutzen wir beide Seitenlinien. So muss der Gegner größere Räume verteidigen.',
+			'Wenn ihr beide Seiten nutzt, muss der Gegner mehr Platz verteidigen.',
 	},
 	{
 		term: 'zur Ballseite verschieben',
-		correctAnswer:
-			'Das ganze Team bewegt sich gemeinsam in Richtung Ball und hält die Abstände klein.',
+		difficulty: 'hard',
+		correctAnswer: 'Das ganze Team bewegt sich gemeinsam in Richtung Ball.',
 		wrongAnswers: [
-			'Nur der Torwart bewegt sich auf die Seite des Balles.',
-			'Alle Spieler tauschen gleichzeitig ihre Positionen.',
-			'Das Team läuft geschlossen auf die ballferne Seite.',
+			'Nur der nächste Spieler läuft zum Ball.',
+			'Alle Spieler tauschen ihre Position.',
+			'Das Team läuft auf die Seite ohne Ball.',
 		],
 		explanation:
-			'Beim Verschieben bewegt sich das Team gemeinsam zur Ballseite und bleibt dabei kompakt.',
+			'Beim Verschieben bewegt ihr euch gemeinsam zur Ballseite und bleibt nah zusammen.',
 	},
 	{
-		term: 'Anspielstation',
-		correctAnswer: 'Ein freier Mitspieler, der den Ball bekommen kann.',
+		term: 'die Anspielstation',
+		difficulty: 'medium',
+		correctAnswer: 'Ein freier Mitspieler, dem du den Ball passen kannst.',
 		wrongAnswers: [
-			'Die Stelle, an der ein Einwurf ausgeführt wird.',
-			'Ein Gegenspieler, der den Pass abfangen soll.',
+			'Die Stelle für einen Einwurf.',
+			'Ein Gegner, der deinen Pass abfangen will.',
 			'Der Mittelpunkt des Spielfelds.',
 		],
-		explanation:
-			'Eine Anspielstation zeigt sich in einem freien Raum und kann einen Pass annehmen.',
+		explanation: 'Eine Anspielstation zeigt sich frei und kann deinen Pass bekommen.',
 	},
 	{
-		term: 'Spielaufbau',
-		correctAnswer: 'Den Ball vom Torwart oder der Abwehr kontrolliert nach vorne spielen.',
+		term: 'der Spielaufbau',
+		difficulty: 'medium',
+		correctAnswer: 'Den Ball vom eigenen Tor kontrolliert nach vorne spielen.',
 		wrongAnswers: [
 			'Vor dem Spiel gemeinsam die Tore aufstellen.',
-			'Bei jedem Ballkontakt sofort auf das Tor schießen.',
-			'Nach einem Foul den Freistoß schnell ausführen.',
+			'Bei jedem Ballkontakt sofort schießen.',
+			'Nach einem Foul schnell weiterspielen.',
 		],
 		explanation:
-			'Beim Spielaufbau bringen wir den Ball kontrolliert vom eigenen Tor in Richtung Angriff.',
+			'Beim Spielaufbau bringt ihr den Ball mit Pässen vom eigenen Tor nach vorne.',
 	},
 	{
-		term: 'Pressing',
-		correctAnswer:
-			'Den Gegner gemeinsam unter Druck setzen, um den Ball zu gewinnen oder einen Fehler zu erzwingen.',
+		term: 'das Pressing',
+		difficulty: 'medium',
+		correctAnswer: 'Den Gegner gemeinsam unter Druck setzen und den Ball jagen.',
 		wrongAnswers: [
-			'Nach einem gewonnenen Spiel für ein Mannschaftsfoto posieren.',
-			'Mit dem Ball möglichst lange an der Seitenlinie warten.',
-			'Alle Spieler ziehen sich bis zum eigenen Tor zurück.',
+			'Nach dem Spiel für ein Foto zusammenstehen.',
+			'Mit dem Ball an der Seitenlinie warten.',
+			'Mit allen Spielern vor dem eigenen Tor stehen.',
 		],
 		explanation:
-			'Beim Pressing setzt das Team den Gegner gemeinsam unter Druck und versucht, den Ball zurückzugewinnen.',
+			'Beim Pressing greift ihr gemeinsam an, damit der Gegner einen Fehler macht.',
 	},
 	{
-		term: 'Lange Ecke',
-		correctAnswer: 'Der Bereich im Tor, der vom Schützen weiter entfernt ist.',
+		term: 'die lange Ecke',
+		difficulty: 'medium',
+		correctAnswer: 'Die Seite des Tores, die weiter vom Schützen entfernt ist.',
 		wrongAnswers: [
-			'Der Bereich im Tor, der dem Schützen am nächsten ist.',
-			'Die Ecke des Spielfelds bei der Eckfahne.',
-			'Der Raum direkt vor dem Elfmeterpunkt.',
+			'Die Seite des Tores direkt beim Schützen.',
+			'Die Ecke des Feldes bei der Eckfahne.',
+			'Der Platz direkt vor dem Elfmeterpunkt.',
 		],
-		explanation:
-			'Die lange Ecke ist die vom Schützen weiter entfernte Seite des Tores. Die nähere Seite heißt kurze Ecke.',
+		explanation: 'Die lange Ecke ist vom Schützen weiter weg als die kurze Ecke.',
 	},
 	{
-		term: 'Corner',
+		term: 'der Corner',
+		difficulty: 'easy',
 		correctAnswer: 'Ein Eckball.',
-		wrongAnswers: [
-			'Ein Einwurf.',
-			'Ein Abstoß.',
-			'Ein direkter Freistoß.',
-		],
-		explanation:
-			'Corner ist ein anderes Wort für Eckball. Er wird von der Ecke des Spielfelds ausgeführt.',
+		wrongAnswers: ['Ein Einwurf.', 'Ein Abstoß.', 'Ein Freistoß.'],
+		explanation: 'Corner ist ein anderes Wort für Eckball.',
 	},
 	{
-		term: 'Auftaktbewegung',
-		correctAnswer:
-			'Eine kurze Bewegung vor dem eigentlichen Lauf, mit der du dich vom Gegner löst.',
+		term: 'die Auftaktbewegung',
+		difficulty: 'medium',
+		correctAnswer: 'Eine kurze Täuschung, bevor du in den freien Raum startest.',
 		wrongAnswers: [
-			'Der Anstoß zu Beginn eines Spiels.',
-			'Das gemeinsame Aufwärmen vor dem Training.',
-			'Das Handzeichen des Schiedsrichters vor einem Freistoß.',
+			'Der Anstoß am Beginn des Spiels.',
+			'Das Aufwärmen vor dem Training.',
+			'Das Zeichen des Schiedsrichters beim Freistoß.',
 		],
 		explanation:
-			'Mit einer Auftaktbewegung täuschst du zuerst eine Richtung an und startest dann in den freien Raum.',
+			'Du täuschst zuerst eine Richtung an und startest dann in die andere.',
 	},
 	{
-		term: 'Finte',
-		correctAnswer: 'Eine Täuschbewegung, mit der du einen Gegner in die falsche Richtung lockst.',
+		term: 'die Finte',
+		difficulty: 'easy',
+		correctAnswer: 'Eine Täuschung, mit der du am Gegner vorbeikommen willst.',
 		wrongAnswers: [
-			'Ein besonders weiter Abschlag des Torwarts.',
-			'Eine kurze Trinkpause während des Trainings.',
-			'Ein Pass, der absichtlich ins Seitenaus gespielt wird.',
+			'Ein weiter Abschlag des Torwarts.',
+			'Eine kurze Trinkpause.',
+			'Ein Pass absichtlich ins Seitenaus.',
+		],
+		explanation: 'Bei einer Finte täuschst du etwas an und machst dann etwas anderes.',
+	},
+	{
+		term: 'die Abseitsfalle',
+		difficulty: 'hard',
+		correctAnswer: 'Die Abwehr läuft gemeinsam vor, damit ein Angreifer im Abseits steht.',
+		wrongAnswers: [
+			'Ein Angreifer wartet unbemerkt hinter dem Torwart.',
+			'Der Torwart lässt den Ball ins Toraus rollen.',
+			'Die Abwehr stellt sich bei einem Eckball ins Tor.',
 		],
 		explanation:
-			'Bei einer Finte täuschst du eine Bewegung oder Richtung an und machst danach etwas anderes.',
+			'Für die Abseitsfalle muss die ganze Abwehr im richtigen Moment vorrücken.',
 	},
 	{
-		term: 'Abseitsfalle',
-		correctAnswer:
-			'Die Abwehr rückt gemeinsam nach vorne, damit ein Angreifer beim Pass im Abseits steht.',
-		wrongAnswers: [
-			'Ein Angreifer versteckt sich hinter dem Torwart.',
-			'Der Torwart lässt einen Ball absichtlich ins Toraus rollen.',
-			'Die Abwehr stellt sich bei einem Eckball auf die Torlinie.',
-		],
-		explanation:
-			'Bei der Abseitsfalle rückt die Abwehr im richtigen Moment gemeinsam vor. Das funktioniert nur mit guter Abstimmung.',
-	},
-	{
-		term: 'Gurkerl',
+		term: 'das Gurkerl',
+		difficulty: 'easy',
 		correctAnswer: 'Den Ball durch die Beine eines Gegners spielen.',
 		wrongAnswers: [
-			'Den Ball mit der Ferse nach hinten spielen.',
-			'Den Ball direkt von der Eckfahne ins Tor schießen.',
-			'Den Ball mit beiden Händen über den Kopf einwerfen.',
+			'Den Ball mit der Ferse zurückspielen.',
+			'Den Ball direkt von der Ecke ins Tor schießen.',
+			'Den Ball besonders weit einwerfen.',
 		],
 		explanation:
-			'In Österreich nennt man es Gurkerl, wenn der Ball durch die Beine eines Gegners gespielt wird.',
+			'In Österreich heißt es Gurkerl, wenn der Ball durch die Beine des Gegners rollt.',
 	},
 	{
-		term: 'Doppelpass',
-		correctAnswer:
-			'Zu einem Mitspieler passen, sofort weiterlaufen und den Ball direkt zurückbekommen.',
+		term: 'der Doppelpass',
+		difficulty: 'easy',
+		correctAnswer: 'Abspielen, weiterlaufen und den Ball sofort zurückbekommen.',
 		wrongAnswers: [
-			'Den Ball zweimal hintereinander mit demselben Fuß berühren.',
-			'Zwei lange Pässe nacheinander auf die andere Spielfeldseite spielen.',
-			'Den Ball zuerst zum Torwart und danach ins Seitenaus spielen.',
+			'Den Ball zweimal mit demselben Fuß berühren.',
+			'Zwei lange Pässe hintereinander spielen.',
+			'Zweimal zum Torwart zurückspielen.',
 		],
 		explanation:
-			'Beim Doppelpass spielst du ab, läufst weiter und bekommst den Ball mit einem direkten Rückpass wieder.',
+			'Beim Doppelpass passt du zu einem Mitspieler und bekommst den Ball direkt zurück.',
 	},
 	{
-		term: 'Schwalbe',
-		correctAnswer: 'Sich ohne echtes Foul absichtlich fallen lassen, um ein Foul vorzutäuschen.',
+		term: 'die Schwalbe',
+		difficulty: 'easy',
+		correctAnswer: 'Ohne echtes Foul fallen und ein Foul vortäuschen.',
 		wrongAnswers: [
-			'Bei einem Kopfball mit beiden Füßen vom Boden abspringen.',
-			'Den Ball mit einem weiten Pass über die Abwehr spielen.',
-			'Nach einem Zweikampf sofort wieder aufstehen.',
+			'Bei einem Kopfball hochspringen.',
+			'Einen hohen Pass über die Abwehr spielen.',
+			'Nach einem Zweikampf schnell aufstehen.',
 		],
-		explanation:
-			'Bei einer Schwalbe täuscht ein Spieler ein Foul vor. Das ist unfair und kann mit einer gelben Karte bestraft werden.',
+		explanation: 'Eine Schwalbe ist unfair und kann eine gelbe Karte geben.',
 	},
 	{
 		term: 'prallen lassen',
-		correctAnswer:
-			'Ein Zuspiel mit nur einem Kontakt direkt zu einem Mitspieler zurück- oder weiterspielen.',
+		difficulty: 'medium',
+		correctAnswer: 'Einen Pass mit einem Kontakt direkt weiterspielen.',
 		wrongAnswers: [
-			'Den Ball nach der Annahme möglichst lange halten.',
-			'Den Ball absichtlich vom eigenen Körper ins Aus springen lassen.',
+			'Den Ball stoppen und lange behalten.',
+			'Den Ball vom Körper ins Aus springen lassen.',
 			'Den Ball hoch über den Torwart lupfen.',
 		],
 		explanation:
-			'Prallen lassen, tropfen lassen und klatschen lassen sind drei Begriffe für dieselbe Aktion: den Ball direkt zurück- oder weiterspielen.',
+			'Prallen lassen heißt auch klatschen lassen: Du spielst den Pass sofort weiter.',
 	},
 	{
-		term: 'tropfen lassen',
-		correctAnswer:
-			'Ein Zuspiel mit nur einem Kontakt direkt zu einem Mitspieler zurück- oder weiterspielen.',
-		wrongAnswers: [
-			'Den Ball ohne Berührung durch die Beine laufen lassen.',
-			'Den Ball bei Regen besonders flach spielen.',
-			'Den Ball aus den Händen auf den Boden fallen lassen.',
-		],
-		explanation:
-			'Tropfen lassen, prallen lassen und klatschen lassen sind drei Begriffe für dieselbe Aktion: den Ball direkt zurück- oder weiterspielen.',
-	},
-	{
-		term: 'klatschen lassen',
-		correctAnswer:
-			'Ein Zuspiel mit nur einem Kontakt direkt zu einem Mitspieler zurück- oder weiterspielen.',
-		wrongAnswers: [
-			'Nach einer guten Aktion für den Mitspieler applaudieren.',
-			'Den Ball mit beiden Händen auf den Boden schlagen.',
-			'Den Ball stoppen und danach zur Seite dribbeln.',
-		],
-		explanation:
-			'Klatschen lassen, prallen lassen und tropfen lassen sind drei Begriffe für dieselbe Aktion: den Ball direkt zurück- oder weiterspielen.',
-	},
-	{
-		term: 'Lupfer',
-		correctAnswer: 'Den Ball mit einem gefühlvollen hohen Bogen über einen Gegner spielen.',
+		term: 'der Lupfer',
+		difficulty: 'easy',
+		correctAnswer: 'Den Ball in einem hohen Bogen über einen Gegner spielen.',
 		wrongAnswers: [
 			'Den Ball besonders hart und flach schießen.',
-			'Den Ball mit der Fußsohle nach hinten ziehen.',
+			'Den Ball mit der Sohle zurückziehen.',
 			'Den Ball mit der Brust stoppen.',
 		],
 		explanation:
-			'Bei einem Lupfer hebst du den Ball gefühlvoll an, damit er in einem Bogen über einen Gegner oder den Torwart fliegt.',
+			'Bei einem Lupfer hebst du den Ball mit Gefühl über einen Gegner oder den Torwart.',
 	},
 	{
-		term: 'Strafraum',
-		correctAnswer:
-			'Der markierte Bereich vor dem Tor, in dem der Torwart den Ball mit den Händen spielen darf.',
+		term: 'der Strafraum',
+		difficulty: 'easy',
+		correctAnswer: 'Der Bereich vor dem Tor, in dem der Torwart die Hände benutzen darf.',
 		wrongAnswers: [
 			'Der Kreis in der Mitte des Spielfelds.',
-			'Der Bereich zwischen Seitenlinie und Zuschauerplätzen.',
-			'Die Zone, in der ein Spieler nach einer gelben Karte warten muss.',
+			'Der Platz zwischen Seitenlinie und Zuschauern.',
+			'Ein Warteplatz für Spieler mit gelber Karte.',
 		],
 		explanation:
-			'Der Strafraum wird auch Box genannt. Begeht die verteidigende Mannschaft dort ein Foul, kann es Elfmeter geben.',
+			'Foult die Abwehr im eigenen Strafraum, kann es einen Elfmeter geben.',
 	},
 	{
-		term: 'Mauer',
-		correctAnswer: 'Mehrere Spieler stellen sich bei einem Freistoß nebeneinander vor das Tor.',
+		term: 'die Mauer',
+		difficulty: 'easy',
+		correctAnswer: 'Mehrere Spieler stehen bei einem Freistoß nebeneinander.',
 		wrongAnswers: [
-			'Die Bande rund um ein Hallenfußballfeld.',
-			'Eine besonders dichte Reihe von Zuschauern.',
-			'Zwei Stürmer stellen sich beim Anstoß nebeneinander.',
+			'Die Bande rund um ein Hallenfeld.',
+			'Eine Reihe von Zuschauern.',
+			'Zwei Stürmer beim Anstoß.',
 		],
-		explanation:
-			'Eine Mauer soll bei einem Freistoß einen Teil des Tores abdecken und den direkten Schuss erschweren.',
+		explanation: 'Die Mauer soll bei einem Freistoß einen Teil des Tores abdecken.',
 	},
 	{
-		term: 'Latte',
-		correctAnswer: 'Die waagrechte obere Stange des Tores.',
+		term: 'die Latte',
+		difficulty: 'easy',
+		correctAnswer: 'Die waagrechte Stange oben am Tor.',
 		wrongAnswers: [
-			'Eine der beiden senkrechten Stangen des Tores.',
+			'Eine senkrechte Stange am Tor.',
 			'Die Linie vor dem Strafraum.',
-			'Die Bank für die Ersatzspieler.',
+			'Die Bank für Ersatzspieler.',
 		],
-		explanation:
-			'Die Latte ist die waagrechte Stange oben am Tor. Die beiden senkrechten Stangen stehen links und rechts.',
+		explanation: 'Die Latte liegt oben auf den beiden Torpfosten.',
 	},
 	{
-		term: 'Übersteiger',
-		correctAnswer:
-			'Mit dem Fuß über oder rund um den Ball kreisen, um eine Dribbelrichtung vorzutäuschen.',
+		term: 'der Übersteiger',
+		difficulty: 'medium',
+		correctAnswer: 'Mit dem Fuß um den Ball kreisen und eine Richtung antäuschen.',
 		wrongAnswers: [
-			'Über einen am Boden liegenden Mitspieler springen.',
+			'Über einen Spieler am Boden springen.',
 			'Den Ball mit dem Kopf über einen Gegner spielen.',
-			'Beim Einwurf mit einem Fuß über die Seitenlinie steigen.',
+			'Beim Einwurf über die Seitenlinie steigen.',
 		],
 		explanation:
-			'Der Übersteiger ist eine Finte: Dein Fuß kreist um den Ball, bevor du in eine andere Richtung wegdribbelst.',
+			'Der Übersteiger ist eine Finte, bevor du in eine andere Richtung dribbelst.',
 	},
 	{
-		term: 'Flanke',
+		term: 'die Flanke',
+		difficulty: 'easy',
 		correctAnswer: 'Den Ball von der Seite vor das gegnerische Tor spielen.',
 		wrongAnswers: [
-			'Den Ball vom Anstoßpunkt zum Torwart zurückspielen.',
-			'Den Ball bei einem Freistoß unter der Mauer durchschießen.',
-			'Den Ball an der Seitenlinie mit dem Körper abschirmen.',
+			'Vom Anstoßpunkt zum Torwart zurückspielen.',
+			'Einen Freistoß unter der Mauer durchschießen.',
+			'Den Ball an der Seitenlinie abschirmen.',
 		],
-		explanation:
-			'Eine Flanke kommt meist von der Seite und wird vor das Tor gespielt, damit ein Mitspieler abschließen kann.',
+		explanation: 'Eine Flanke kommt von der Seite und fliegt oder rollt vor das Tor.',
 	},
 	{
 		term: 'den Gegner doppeln',
-		correctAnswer: 'Zu zweit gegen den ballführenden Gegner verteidigen.',
+		difficulty: 'medium',
+		correctAnswer: 'Zu zweit gegen den Spieler mit Ball verteidigen.',
 		wrongAnswers: [
-			'Denselben Gegenspieler zweimal hintereinander foulen.',
-			'Nach einem Tor sofort ein zweites Tor erzielen.',
-			'Die Rückennummer eines Gegners übernehmen.',
+			'Denselben Gegner zweimal foulen.',
+			'Nach einem Tor sofort noch eines schießen.',
+			'Die Rückennummer eines Gegners tragen.',
 		],
 		explanation:
-			'Beim Doppeln setzt ein Spieler den Gegner unter Druck, während ein zweiter Spieler hilft und absichert.',
+			'Beim Doppeln greift ein Spieler an und ein zweiter hilft ihm dabei.',
 	},
 	{
-		term: 'Konter',
-		correctAnswer:
-			'Nach einem Ballgewinn schnell angreifen, bevor sich der Gegner wieder sortiert hat.',
+		term: 'der Konter',
+		difficulty: 'easy',
+		correctAnswer: 'Nach einem Ballgewinn sofort schnell angreifen.',
 		wrongAnswers: [
-			'Den Ball bei jeder Gelegenheit zurück zum Torwart spielen.',
-			'Nach einem Gegentor besonders langsam weiterspielen.',
-			'Bei einem Eckball alle Spieler an der Mittellinie aufstellen.',
+			'Den Ball immer zum Torwart zurückspielen.',
+			'Nach einem Gegentor langsam weiterspielen.',
+			'Beim Eckball an der Mittellinie warten.',
 		],
 		explanation:
-			'Bei einem Konter schaltet das Team nach einem Ballgewinn schnell auf Angriff um und nutzt die freien Räume.',
+			'Beim Konter nutzt ihr schnell den freien Raum, bevor der Gegner zurück ist.',
 	},
 	{
-		term: 'Abschluss',
-		correctAnswer: 'Die letzte Aktion eines Angriffs, meistens ein Schuss auf das Tor.',
+		term: 'der Abschluss',
+		difficulty: 'easy',
+		correctAnswer: 'Die letzte Aktion eines Angriffs, meistens ein Torschuss.',
 		wrongAnswers: [
 			'Der Schlusspfiff des Schiedsrichters.',
-			'Das gemeinsame Zusammenräumen nach dem Training.',
-			'Ein Rückpass aus dem Mittelfeld zur eigenen Abwehr.',
+			'Das Aufräumen nach dem Training.',
+			'Ein Rückpass zur eigenen Abwehr.',
 		],
-		explanation:
-			'Mit dem Abschluss beendest du einen Angriff – meistens durch einen Schuss oder Kopfball auf das Tor.',
+		explanation: 'Mit einem Schuss oder Kopfball schließt du den Angriff ab.',
 	},
 	{
 		term: 'kompakt stehen',
-		correctAnswer:
-			'Als Team mit kleinen Abständen zusammenstehen, damit der Gegner wenig freie Räume hat.',
+		difficulty: 'hard',
+		correctAnswer: 'Als Team mit kleinen Abständen verteidigen.',
 		wrongAnswers: [
-			'Alle Spieler stehen möglichst weit voneinander entfernt.',
-			'Die Mannschaft bleibt bei jedem Angriff im eigenen Strafraum.',
-			'Jeder Spieler läuft allein seinem nächsten Gegner hinterher.',
+			'Mit möglichst großen Abständen stehen.',
+			'Mit allen Spielern im Strafraum bleiben.',
+			'Allein dem nächsten Gegner nachlaufen.',
 		],
 		explanation:
-			'Wenn wir kompakt stehen, sind die Abstände zwischen uns klein und der Gegner findet nur schwer einen Weg durch unser Team.',
+			'Mit kleinen Abständen lasst ihr dem Gegner wenig Platz zwischen euch.',
 	},
 	{
-		term: 'Standardsituation',
-		correctAnswer:
-			'Eine festgelegte Spielfortsetzung nach einer Unterbrechung, zum Beispiel Freistoß oder Eckball.',
+		term: 'die Standardsituation',
+		difficulty: 'hard',
+		correctAnswer: 'Eine Spielfortsetzung wie Freistoß, Eckball oder Einwurf.',
 		wrongAnswers: [
-			'Eine normale Passfolge aus dem laufenden Spiel.',
-			'Die Startaufstellung einer Mannschaft vor dem Anpfiff.',
-			'Eine Trinkpause bei besonders heißem Wetter.',
+			'Eine Passfolge während des laufenden Spiels.',
+			'Die Aufstellung vor dem Anpfiff.',
+			'Eine Trinkpause bei heißem Wetter.',
 		],
 		explanation:
-			'Freistöße, Eckbälle, Einwürfe und Elfmeter sind Standardsituationen, die ein Team gezielt vorbereiten kann.',
+			'Nach einer Unterbrechung beginnt das Spiel mit einer Standardsituation wieder.',
 	},
 	{
 		term: 'hoch verteidigen',
-		correctAnswer:
-			'Weit weg vom eigenen Tor stehen und den Gegner schon früh unter Druck setzen.',
+		difficulty: 'hard',
+		correctAnswer: 'Weit vor dem eigenen Tor stehen und den Gegner früh stören.',
 		wrongAnswers: [
 			'Nur hohe Bälle mit dem Kopf verteidigen.',
-			'Alle Spieler stellen sich direkt vor das eigene Tor.',
-			'Die Verteidiger springen bei jedem Pass in die Höhe.',
+			'Mit allen Spielern direkt vor dem Tor stehen.',
+			'Bei jedem Pass in die Höhe springen.',
 		],
 		explanation:
-			'Beim hohen Verteidigen steht das Team weiter vorne im Feld und versucht, den Gegner früh unter Druck zu setzen.',
+			'Beim hohen Verteidigen versucht ihr, den Ball weit vorne zu gewinnen.',
 	},
 	{
 		term: 'tief verteidigen',
-		correctAnswer:
-			'Nahe am eigenen Tor stehen und dem Gegner wenig Raum hinter der Abwehr lassen.',
+		difficulty: 'hard',
+		correctAnswer: 'Nah am eigenen Tor stehen und den Raum dahinter schützen.',
 		wrongAnswers: [
-			'Flache Pässe grundsätzlich ins Seitenaus spielen.',
-			'Die Abwehr stellt sich nahe beim gegnerischen Tor auf.',
-			'Alle Spieler gehen bei einem Kopfball in die Knie.',
+			'Flache Pässe immer ins Aus spielen.',
+			'Nahe beim gegnerischen Tor verteidigen.',
+			'Bei jedem Kopfball in die Knie gehen.',
 		],
 		explanation:
-			'Beim tiefen Verteidigen zieht sich das Team näher zum eigenen Tor zurück und schützt besonders den Raum hinter der Abwehr.',
+			'Beim tiefen Verteidigen zieht ihr euch näher zum eigenen Tor zurück.',
 	},
 	{
-		term: 'Stanglpass',
-		correctAnswer:
-			'Den Ball flach und scharf quer durch den Strafraum zur zweiten Stange spielen.',
+		term: 'der Stanglpass',
+		difficulty: 'hard',
+		correctAnswer: 'Ein flacher, scharfer Pass quer vor dem Tor.',
 		wrongAnswers: [
-			'Den Ball von der Grundlinie flach zurück an den Strafraumrand spielen.',
-			'Den Ball hoch vor das Tor flanken, damit ein Mitspieler köpfen kann.',
-			'Einen flachen Steilpass zwischen den Verteidigern hindurch spielen.',
+			'Ein flacher Rückpass an den Strafraumrand.',
+			'Eine hohe Flanke vor das Tor.',
+			'Ein Pass gerade durch die Abwehr.',
 		],
 		explanation:
-			'Ein Stanglpass läuft flach vor dem Tor entlang, damit ein Mitspieler ihn an der zweiten Stange verwerten kann.',
+			'Der Stanglpass rollt schnell vor dem Tor zur zweiten Stange.',
 	},
 	{
-		term: 'Deckungsschatten',
-		correctAnswer:
-			'Sich so positionieren, dass ein Passweg zugestellt ist und der eigene Gegenspieler trotzdem gedeckt bleibt.',
+		term: 'der Deckungsschatten',
+		difficulty: 'hard',
+		correctAnswer: 'Du läufst den Spieler so an, dass dein Körper einen Passweg versperrt.',
 		wrongAnswers: [
-			'Den ballführenden Gegner gemeinsam mit einem Mitspieler von zwei Seiten unter Druck setzen.',
-			'Einen Gegenspieler eng verfolgen, ohne dabei auf andere Passwege zu achten.',
-			'Einen freien Raum hinter einem Mitspieler absichern, falls dieser überspielt wird.',
+			'Du greifst den Spieler mit einem Mitspieler von zwei Seiten an.',
+			'Du bleibst immer zwischen deinem Gegner und dem eigenen Tor.',
+			'Du sicherst nur den Raum hinter einem Mitspieler ab.',
 		],
 		explanation:
-			'Im Deckungsschatten wird ein weiterer Gegner durch deine Körperposition als Anspielstation ausgeschaltet.',
+			'In deinem Deckungsschatten kann ein Gegner nur schwer angespielt werden.',
 	},
 	{
-		term: 'Frei laufen',
-		correctAnswer:
-			'Sich vom Gegenspieler lösen und in einen freien Raum bewegen, um angespielt werden zu können.',
+		term: 'sich freilaufen',
+		difficulty: 'hard',
+		correctAnswer: 'Sich vom Gegner lösen und in einen freien Raum laufen.',
 		wrongAnswers: [
-			'Mit einem Lauf einen Gegenspieler wegziehen, damit ein Mitspieler den freien Raum nutzen kann.',
-			'Sich zwischen Ball und Gegenspieler stellen, um ein Zuspiel mit dem Körper abzuschirmen.',
-			'Nach einem Ballverlust in den Rücken eines Mitspielers laufen, um ihn abzusichern.',
+			'Einen Gegner wegziehen, damit ein Mitspieler Platz hat.',
+			'Den Ball mit dem Körper vor einem Gegner schützen.',
+			'Nach einem Ballverlust einen Mitspieler absichern.',
 		],
 		explanation:
-			'Beim Freilaufen schaffst du Abstand zu deinem Gegenspieler und wirst dadurch zur Anspielstation.',
+			'Beim Freilaufen schaffst du Platz zwischen dir und deinem Gegner.',
 	},
 ] satisfies FootballQuizQuestion[];

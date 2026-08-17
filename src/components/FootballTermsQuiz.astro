@@ -66,6 +66,7 @@ const gameLength = FOOTBALL_QUIZ_GAME_LENGTH;
 <script>
 	interface QuizQuestion {
 		term: string;
+		difficulty: 'easy' | 'medium' | 'hard';
 		correctAnswer: string;
 		wrongAnswers: string[];
 		explanation: string;
@@ -92,8 +93,13 @@ const gameLength = FOOTBALL_QUIZ_GAME_LENGTH;
 	const HOLD_DURATION_MS = 900;
 	const RELEASE_DURATION_MS = 550;
 	const GAME_LENGTH = 11;
+	const QUESTIONS_PER_DIFFICULTY = {
+		easy: 6,
+		medium: 3,
+		hard: 2,
+	} satisfies Record<QuizQuestion['difficulty'], number>;
 	const ANSWER_LETTERS = ['A', 'B', 'C', 'D'];
-	const PROGRESS_STORAGE_KEY = 'svurfahr-football-quiz-progress-v1';
+	const PROGRESS_STORAGE_KEY = 'svurfahr-football-quiz-progress-v2';
 
 	function requireQuizElement<T extends Element>(element: T | null, selector: string): T {
 		if (!element) {
@@ -110,6 +116,9 @@ const gameLength = FOOTBALL_QUIZ_GAME_LENGTH;
 
 		return (
 			typeof question.term === 'string' &&
+			(question.difficulty === 'easy' ||
+				question.difficulty === 'medium' ||
+				question.difficulty === 'hard') &&
 			typeof question.correctAnswer === 'string' &&
 			Array.isArray(question.wrongAnswers) &&
 			question.wrongAnswers.length === 3 &&
@@ -144,21 +153,38 @@ const gameLength = FOOTBALL_QUIZ_GAME_LENGTH;
 	}
 
 	function createGame(questions: QuizQuestion[]): GameQuestion[] {
-		if (questions.length < GAME_LENGTH) {
-			throw new Error(`The football quiz needs at least ${GAME_LENGTH} unique questions.`);
+		const selectedQuestions = (
+			Object.entries(QUESTIONS_PER_DIFFICULTY) as [
+				QuizQuestion['difficulty'],
+				number,
+			][]
+		).flatMap(([difficulty, count]) => {
+			const questionsAtDifficulty = questions.filter(
+				(question) => question.difficulty === difficulty,
+			);
+
+			if (questionsAtDifficulty.length < count) {
+				throw new Error(
+					`The football quiz needs at least ${count} ${difficulty} questions.`,
+				);
+			}
+
+			return shuffle(questionsAtDifficulty).slice(0, count);
+		});
+
+		if (selectedQuestions.length !== GAME_LENGTH) {
+			throw new Error(`The football quiz needs exactly ${GAME_LENGTH} questions per game.`);
 		}
 
-		return shuffle([...questions])
-			.slice(0, GAME_LENGTH)
-			.map((question) => {
-				const answers = shuffle([question.correctAnswer, ...question.wrongAnswers]);
+		return shuffle(selectedQuestions).map((question) => {
+			const answers = shuffle([question.correctAnswer, ...question.wrongAnswers]);
 
-				return {
-					...question,
-					answers,
-					correctIndex: answers.indexOf(question.correctAnswer),
-				};
-			});
+			return {
+				...question,
+				answers,
+				correctIndex: answers.indexOf(question.correctAnswer),
+			};
+		});
 	}
 
 	function initializeFootballQuizzes() {
