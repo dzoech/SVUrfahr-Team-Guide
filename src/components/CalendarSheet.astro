@@ -6,6 +6,7 @@ import {
 } from '../lib/calendar';
 
 const events = await getUpcomingEvents();
+const lastUpdated = new Date();
 const timeZone = 'Europe/Vienna';
 
 const dateFormatter = new Intl.DateTimeFormat('de-AT', {
@@ -17,6 +18,11 @@ const dateFormatter = new Intl.DateTimeFormat('de-AT', {
 const timeFormatter = new Intl.DateTimeFormat('de-AT', {
 	hour: '2-digit',
 	minute: '2-digit',
+	timeZone,
+});
+const lastUpdatedFormatter = new Intl.DateTimeFormat('de-AT', {
+	dateStyle: 'medium',
+	timeStyle: 'short',
 	timeZone,
 });
 
@@ -33,7 +39,7 @@ function mapUrl(event: CalendarEvent): string {
 	<div class="heading">
 		<div>
 			<p class="eyebrow">Meisterschaftskalender</p>
-			<h2>Nächste Meisterschaftsspiele</h2>
+			<h2>Nächste Matches</h2>
 		</div>
 		<a class="subscribe" href={CALENDAR_SUBSCRIPTION_URL}>Abonnieren</a>
 	</div>
@@ -65,7 +71,11 @@ function mapUrl(event: CalendarEvent): string {
 		<p class="empty">Aktuell sind keine zukünftigen Meisterschaftsspiele eingetragen.</p>
 	)}
 
-	<p class="source">Automatisch aus dem offiziellen Meisterschaftskalender aktualisiert.</p>
+	<p class="source">
+		Automatisch aus dem offiziellen Meisterschaftskalender aktualisiert.<br />
+		Zuletzt aktualisiert:
+		<time datetime={lastUpdated.toISOString()}>{lastUpdatedFormatter.format(lastUpdated)} Uhr</time>
+	</p>
 </section>
 
 <style>
@@ -216,5 +226,11 @@ function mapUrl(event: CalendarEvent): string {
 		color: var(--muted);
 		font-size: 0.72rem;
 		text-align: center;
+	}
+
+	.source time {
+		display: inline;
+		color: inherit;
+		text-transform: none;
 	}
 </style>
