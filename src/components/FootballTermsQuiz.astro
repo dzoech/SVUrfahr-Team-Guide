@@ -6,6 +6,9 @@ import {
 
 const firstQuestion = FOOTBALL_QUIZ_QUESTIONS[0];
 const firstAnswers = [firstQuestion.correctAnswer, ...firstQuestion.wrongAnswers];
+const firstPrompt = firstQuestion.context
+	? `${firstQuestion.prompt.charAt(0).toLocaleLowerCase('de-AT')}${firstQuestion.prompt.slice(1)}`
+	: firstQuestion.prompt;
 const answerLetters = ['A', 'B', 'C', 'D'];
 const gameLength = FOOTBALL_QUIZ_GAME_LENGTH;
 ---
@@ -20,8 +23,8 @@ const gameLength = FOOTBALL_QUIZ_GAME_LENGTH;
 	<div class="question-sheet" data-question-sheet>
 		<p>Fußballbegriff</p>
 		<h2>
-			<span data-question-context>{firstQuestion.context ? `${firstQuestion.context}:` : ''}</span>
-			<span data-question-prompt>{firstQuestion.prompt}</span>
+			<span data-question-context>{firstQuestion.context ? `${firstQuestion.context},` : ''}</span>
+			<span data-question-prompt>{firstPrompt}</span>
 			<mark data-question-term>{firstQuestion.term}</mark>?
 		</h2>
 	</div>
@@ -160,6 +163,12 @@ const gameLength = FOOTBALL_QUIZ_GAME_LENGTH;
 		}
 
 		return values;
+	}
+
+	function getDisplayedPrompt(question: QuizQuestion): string {
+		if (!question.context) return question.prompt;
+
+		return `${question.prompt.charAt(0).toLocaleLowerCase('de-AT')}${question.prompt.slice(1)}`;
 	}
 
 	function createGame(questions: QuizQuestion[]): GameQuestion[] {
@@ -682,8 +691,8 @@ const gameLength = FOOTBALL_QUIZ_GAME_LENGTH;
 				answered = false;
 				currentRoundIndex = roundIndex;
 				questionCount.textContent = `Frage ${roundIndex + 1} von ${GAME_LENGTH}`;
-				questionContext.textContent = question.context ? `${question.context}:` : '';
-				questionPrompt.textContent = question.prompt;
+				questionContext.textContent = question.context ? `${question.context},` : '';
+				questionPrompt.textContent = getDisplayedPrompt(question);
 				questionTerm.textContent = question.term;
 				questionSheet.hidden = false;
 				answerGrid.hidden = false;
