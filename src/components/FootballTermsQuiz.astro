@@ -76,10 +76,24 @@ const gameLength = FOOTBALL_QUIZ_GAME_LENGTH;
 		correctIndex: number;
 	}
 
+	interface RoundAnswer {
+		selectedIndex: number;
+		isCorrect: boolean;
+	}
+
+	interface StoredProgress {
+		gameQuestions: GameQuestion[];
+		currentRoundIndex: number;
+		score: number;
+		roundAnswers: Record<number, RoundAnswer>;
+		finished: boolean;
+	}
+
 	const HOLD_DURATION_MS = 900;
 	const RELEASE_DURATION_MS = 550;
 	const GAME_LENGTH = 11;
 	const ANSWER_LETTERS = ['A', 'B', 'C', 'D'];
+	const PROGRESS_STORAGE_KEY = 'svurfahr-football-quiz-progress-v1';
 
 	function requireQuizElement<T extends Element>(element: T | null, selector: string): T {
 		if (!element) {
@@ -101,6 +115,22 @@ const gameLength = FOOTBALL_QUIZ_GAME_LENGTH;
 			question.wrongAnswers.length === 3 &&
 			question.wrongAnswers.every((answer) => typeof answer === 'string') &&
 			typeof question.explanation === 'string'
+		);
+	}
+
+	function isGameQuestion(value: unknown): value is GameQuestion {
+		if (!isQuizQuestion(value)) return false;
+
+		const question = value as Partial<GameQuestion>;
+
+		return (
+			Array.isArray(question.answers) &&
+			question.answers.length === 4 &&
+			question.answers.every((answer) => typeof answer === 'string') &&
+			Number.isInteger(question.correctIndex) &&
+			(question.correctIndex as number) >= 0 &&
+			(question.correctIndex as number) <= 3 &&
+			question.answers[question.correctIndex as number] === question.correctAnswer
 		);
 	}
 
@@ -219,13 +249,122 @@ const gameLength = FOOTBALL_QUIZ_GAME_LENGTH;
 			}
 
 			const questions = parsedQuestions;
-			let gameQuestions = createGame(questions);
+			let gameQuestions: GameQuestion[] = [];
 			let currentRoundIndex = 0;
 			let score = 0;
 			let answered = false;
+			let roundAnswers: Record<number, RoundAnswer> = {};
+			let finished = false;
 			let holdTimer: number | undefined;
 			let releaseTimer: number | undefined;
 			let heldButton: HTMLButtonElement | null = null;
+
+			function saveProgress() {
+				try {
+					const payload: StoredProgress = {
+						gameQuestions,
+						currentRoundIndex,
+						score,
+						roundAnswers,
+						finished,
+					};
+
+					window.localStorage.setItem(PROGRESS_STORAGE_KEY, JSON.stringify(payload));
+				} catch {
+					// Storage may be unavailable (private browsing, quota, disabled) - progress
+					// simply won't persist, and the quiz keeps working in-memory as before.
+				}
+			}
+
+			function loadProgress(): StoredProgress | null {
+				try {
+					const raw = window.localStorage.getItem(PROGRESS_STORAGE_KEY);
+					if (!raw) return null;
+
+					const parsed: unknown = JSON.parse(raw);
+
+					if (typeof parsed !== 'object' || parsed === null) return null;
+
+					const candidate = parsed as Partial<StoredProgress>;
+
+					if (
+						!Array.isArray(candidate.gameQuestions) ||
+						candidate.gameQuestions.length !== GAME_LENGTH ||
+						!candidate.gameQuestions.every(isGameQuestion)
+					) {
+						return null;
+					}
+
+					const restoredGameQuestions = candidate.gameQuestions;
+
+					if (
+						!Number.isInteger(candidate.currentRoundIndex) ||
+						(candidate.currentRoundIndex as number) < 0 ||
+						(candidate.currentRoundIndex as number) >= GAME_LENGTH
+					) {
+						return null;
+					}
+
+					const restoredCurrentRoundIndex = candidate.currentRoundIndex as number;
+
+					if (typeof candidate.roundAnswers !== 'object' || candidate.roundAnswers === null) {
+						return null;
+					}
+
+					const restoredRoundAnswers: Record<number, RoundAnswer> = {};
+
+					for (const [key, value] of Object.entries(candidate.roundAnswers)) {
+						const roundIndex = Number(key);
+
+						if (
+							!Number.isInteger(roundIndex) ||
+							roundIndex < 0 ||
+							roundIndex > restoredCurrentRoundIndex ||
+							typeof value !== 'object' ||
+							value === null
+						) {
+							return null;
+						}
+
+						const answer = value as Partial<RoundAnswer>;
+						const question = restoredGameQuestions[roundIndex];
+
+						if (
+							!question ||
+							!Number.isInteger(answer.selectedIndex) ||
+							(answer.selectedIndex as number) < 0 ||
+							(answer.selectedIndex as number) > 3
+						) {
+							return null;
+						}
+
+						restoredRoundAnswers[roundIndex] = {
+							selectedIndex: answer.selectedIndex as number,
+							isCorrect: answer.selectedIndex === question.correctIndex,
+						};
+					}
+
+					const restoredScore = Object.values(restoredRoundAnswers).filter(
+						(answer) => answer.isCorrect,
+					).length;
+
+					const restoredFinished =
+						candidate.finished === true &&
+						Array.from({ length: GAME_LENGTH }, (_value, index) => index).every(
+							(index) => restoredRoundAnswers[index] !== undefined,
+						);
+
+					return {
+						gameQuestions: restoredGameQuestions,
+						currentRoundIndex: restoredCurrentRoundIndex,
+						score: restoredScore,
+						roundAnswers: restoredRoundAnswers,
+						finished: restoredFinished,
+					};
+				} catch {
+					return null;
+				}
+			}
 
 			function cancelHold() {
 				if (holdTimer !== undefined) {
@@ -321,21 +460,42 @@ const gameLength = FOOTBALL_QUIZ_GAME_LENGTH;
 				}
 			}
 
-			function lockAnswer(button: HTMLButtonElement) {
-				cancelHold();
-				answered = true;
+			function recordAnswer(selectedIndex: number): { question: GameQuestion; isCorrect: boolean } | null {
+				// Idempotent guard: a restored/replayed round or a duplicate lock attempt must
+				// never re-score an already-answered round.
+				if (answered) return null;
 
-				const selectedIndex = Number(button.dataset.answerIndex);
 				const question = gameQuestions[currentRoundIndex];
 
 				if (!Number.isInteger(selectedIndex) || !question) {
 					throw new Error('The selected football quiz answer is invalid.');
 				}
 
+				answered = true;
+
+				const isCorrect = selectedIndex === question.correctIndex;
+
+				roundAnswers[currentRoundIndex] = { selectedIndex, isCorrect };
+
+				if (isCorrect) {
+					score += 1;
+					scoreDisplay.textContent = String(score);
+				}
+
+				saveProgress();
+
+				return { question, isCorrect };
+			}
+
+			function renderAnswerResult(
+				button: HTMLButtonElement,
+				question: GameQuestion,
+				isCorrect: boolean,
+				options: { launchCelebration: boolean },
+			) {
 				const answerButtons =
 					answerGrid.querySelectorAll<HTMLButtonElement>('[data-answer-index]');
 				const correctButton = answerButtons.item(question.correctIndex);
-				const isCorrect = selectedIndex === question.correctIndex;
 
 				for (const answerButton of answerButtons) {
 					answerButton.setAttribute('aria-disabled', 'true');
@@ -345,9 +505,6 @@ const gameLength = FOOTBALL_QUIZ_GAME_LENGTH;
 
 				if (!isCorrect) {
 					correctButton?.classList.add('correct-answer');
-				} else {
-					score += 1;
-					scoreDisplay.textContent = String(score);
 				}
 
 				result.classList.toggle('correct-result', isCorrect);
@@ -362,8 +519,43 @@ const gameLength = FOOTBALL_QUIZ_GAME_LENGTH;
 				nextButton.textContent =
 					currentRoundIndex === GAME_LENGTH - 1 ? 'Ergebnis ansehen →' : 'Nächste Frage →';
 
-				if (isCorrect) {
+				if (isCorrect && options.launchCelebration) {
 					launchFireworks(button);
+				}
+			}
+
+			function lockAnswer(button: HTMLButtonElement) {
+				cancelHold();
+
+				const selectedIndex = Number(button.dataset.answerIndex);
+				const recorded = recordAnswer(selectedIndex);
+
+				if (!recorded) return;
+
+				renderAnswerResult(button, recorded.question, recorded.isCorrect, {
+					launchCelebration: true,
+				});
+			}
+
+			function restoreAnsweredRound(roundIndex: number) {
+				const storedAnswer = roundAnswers[roundIndex];
+				const question = gameQuestions[roundIndex];
+
+				if (!storedAnswer || !question) return;
+
+				renderQuestion(roundIndex);
+				// renderQuestion() resets `answered` to false as part of a fresh round - reapply
+				// it here since this round was already answered before the page was reloaded.
+				answered = true;
+
+				const button = answerGrid.querySelector<HTMLButtonElement>(
+					`[data-answer-index="${storedAnswer.selectedIndex}"]`,
+				);
+
+				if (button) {
+					renderAnswerResult(button, question, storedAnswer.isCorrect, {
+						launchCelebration: false,
+					});
 				}
 			}
 
@@ -456,10 +648,12 @@ const gameLength = FOOTBALL_QUIZ_GAME_LENGTH;
 				holdBadge.hidden = false;
 				finalScore.hidden = true;
 				fireworks.replaceChildren();
+				saveProgress();
 			}
 
 			function showFinalScore() {
 				cancelHold();
+				finished = true;
 				questionCount.textContent = 'Spiel beendet';
 				questionSheet.hidden = true;
 				answerGrid.hidden = true;
@@ -478,12 +672,15 @@ const gameLength = FOOTBALL_QUIZ_GAME_LENGTH;
 				finalScore.hidden = false;
 				nextButton.textContent = 'Neues Spiel starten ↻';
 				nextButton.hidden = false;
+				saveProgress();
 			}
 
 			function startNewGame() {
 				gameQuestions = createGame(questions);
 				score = 0;
 				scoreDisplay.textContent = '0';
+				roundAnswers = {};
+				finished = false;
 				renderQuestion(0);
 			}
 
@@ -504,7 +701,26 @@ const gameLength = FOOTBALL_QUIZ_GAME_LENGTH;
 				});
 			});
 
-			startNewGame();
+			const restoredProgress = loadProgress();
+
+			if (restoredProgress) {
+				gameQuestions = restoredProgress.gameQuestions;
+				currentRoundIndex = restoredProgress.currentRoundIndex;
+				score = restoredProgress.score;
+				roundAnswers = restoredProgress.roundAnswers;
+				finished = restoredProgress.finished;
+				scoreDisplay.textContent = String(score);
+
+				if (finished) {
+					showFinalScore();
+				} else if (roundAnswers[currentRoundIndex]) {
+					restoreAnsweredRound(currentRoundIndex);
+				} else {
+					renderQuestion(currentRoundIndex);
+				}
+			} else {
+				startNewGame();
+			}
 		}
 	}
 
