@@ -69,7 +69,7 @@ const gameLength = FOOTBALL_QUIZ_GAME_LENGTH;
 <script>
 	interface QuizQuestion {
 		term: string;
-		prompt: 'Was ist' | 'Was bedeutet';
+		prompt: 'Was ist' | 'Was bedeutet' | 'Beim Verteidigen, was bedeutet';
 		difficulty: 'easy' | 'medium' | 'hard';
 		correctAnswer: string;
 		wrongAnswers: string[];
@@ -120,7 +120,9 @@ const gameLength = FOOTBALL_QUIZ_GAME_LENGTH;
 
 		return (
 			typeof question.term === 'string' &&
-			(question.prompt === 'Was ist' || question.prompt === 'Was bedeutet') &&
+			(question.prompt === 'Was ist' ||
+				question.prompt === 'Was bedeutet' ||
+				question.prompt === 'Beim Verteidigen, was bedeutet') &&
 			(question.difficulty === 'easy' ||
 				question.difficulty === 'medium' ||
 				question.difficulty === 'hard') &&
