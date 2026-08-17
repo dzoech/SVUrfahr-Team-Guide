@@ -77,6 +77,7 @@ const gameLength = FOOTBALL_QUIZ_GAME_LENGTH;
 	}
 
 	const HOLD_DURATION_MS = 900;
+	const RELEASE_DURATION_MS = 550;
 	const GAME_LENGTH = 11;
 	const ANSWER_LETTERS = ['A', 'B', 'C', 'D'];
 
@@ -223,6 +224,7 @@ const gameLength = FOOTBALL_QUIZ_GAME_LENGTH;
 			let score = 0;
 			let answered = false;
 			let holdTimer: number | undefined;
+			let releaseTimer: number | undefined;
 			let heldButton: HTMLButtonElement | null = null;
 
 			function cancelHold() {
@@ -233,6 +235,44 @@ const gameLength = FOOTBALL_QUIZ_GAME_LENGTH;
 
 				heldButton?.classList.remove('holding');
 				heldButton = null;
+			}
+
+			function clearRelease(button: HTMLButtonElement) {
+				if (releaseTimer !== undefined) {
+					window.clearTimeout(releaseTimer);
+					releaseTimer = undefined;
+				}
+
+				button.classList.remove('releasing');
+				button.style.removeProperty('--fill-width');
+			}
+
+			function releaseHold() {
+				const button = heldButton;
+
+				if (!button || holdTimer === undefined || answered) {
+					cancelHold();
+					return;
+				}
+
+				const currentWidth = window.getComputedStyle(button, '::before').width;
+
+				cancelHold();
+				clearRelease(button);
+
+				button.style.setProperty('--fill-width', currentWidth);
+				button.classList.add('releasing');
+
+				// Force a reflow so the transition below animates from currentWidth down to 0.
+				void button.offsetWidth;
+
+				button.style.setProperty('--fill-width', '0');
+
+				releaseTimer = window.setTimeout(() => {
+					releaseTimer = undefined;
+					button.classList.remove('releasing');
+					button.style.removeProperty('--fill-width');
+				}, RELEASE_DURATION_MS);
 			}
 
 			function launchFireworks(sourceButton: HTMLButtonElement) {
@@ -331,6 +371,7 @@ const gameLength = FOOTBALL_QUIZ_GAME_LENGTH;
 				if (answered || button.disabled) return;
 
 				cancelHold();
+				clearRelease(button);
 				heldButton = button;
 				button.classList.add('holding');
 				holdTimer = window.setTimeout(() => lockAnswer(button), HOLD_DURATION_MS);
@@ -344,9 +385,9 @@ const gameLength = FOOTBALL_QUIZ_GAME_LENGTH;
 					button.setPointerCapture(event.pointerId);
 					startHold(button);
 				});
-				button.addEventListener('pointerup', cancelHold);
-				button.addEventListener('pointercancel', cancelHold);
-				button.addEventListener('lostpointercapture', cancelHold);
+				button.addEventListener('pointerup', releaseHold);
+				button.addEventListener('pointercancel', releaseHold);
+				button.addEventListener('lostpointercapture', releaseHold);
 				button.addEventListener('contextmenu', (event) => event.preventDefault());
 				button.addEventListener('click', (event) => event.preventDefault());
 				button.addEventListener('keydown', (event) => {
@@ -358,10 +399,10 @@ const gameLength = FOOTBALL_QUIZ_GAME_LENGTH;
 				button.addEventListener('keyup', (event) => {
 					if (event.key === ' ' || event.key === 'Enter') {
 						event.preventDefault();
-						cancelHold();
+						releaseHold();
 					}
 				});
-				button.addEventListener('blur', cancelHold);
+				button.addEventListener('blur', releaseHold);
 			}
 
 			function createAnswerButton(answer: string, index: number) {
@@ -627,12 +668,16 @@ const gameLength = FOOTBALL_QUIZ_GAME_LENGTH;
 		position: absolute;
 		z-index: 0;
 		inset: 0 auto 0 0;
-		width: 0;
+		width: var(--fill-width, 0);
 		background: #f4c542;
 	}
 
 	.answer-button.holding::before {
 		animation: hold-to-answer 900ms linear forwards;
+	}
+
+	.answer-button.releasing::before {
+		transition: width var(--release-duration, 550ms) ease-out;
 	}
 
 	.answer-button > span {
