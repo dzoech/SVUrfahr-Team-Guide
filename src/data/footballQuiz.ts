@@ -410,4 +410,40 @@ export const FOOTBALL_QUIZ_QUESTIONS = [
 		explanation:
 			'Beim tiefen Verteidigen zieht sich das Team näher zum eigenen Tor zurück und schützt besonders den Raum hinter der Abwehr.',
 	},
+	{
+		term: 'Stanglpass',
+		correctAnswer:
+			'Den Ball flach und scharf quer durch den Strafraum zur zweiten Stange spielen.',
+		wrongAnswers: [
+			'Den Ball von der Grundlinie flach zurück an den Strafraumrand spielen.',
+			'Den Ball hoch vor das Tor flanken, damit ein Mitspieler köpfen kann.',
+			'Einen flachen Steilpass zwischen den Verteidigern hindurch spielen.',
+		],
+		explanation:
+			'Ein Stanglpass läuft flach vor dem Tor entlang, damit ein Mitspieler ihn an der zweiten Stange verwerten kann.',
+	},
+	{
+		term: 'Deckungsschatten',
+		correctAnswer:
+			'Sich so positionieren, dass ein Passweg zugestellt ist und der eigene Gegenspieler trotzdem gedeckt bleibt.',
+		wrongAnswers: [
+			'Den ballführenden Gegner gemeinsam mit einem Mitspieler von zwei Seiten unter Druck setzen.',
+			'Einen Gegenspieler eng verfolgen, ohne dabei auf andere Passwege zu achten.',
+			'Einen freien Raum hinter einem Mitspieler absichern, falls dieser überspielt wird.',
+		],
+		explanation:
+			'Im Deckungsschatten wird ein weiterer Gegner durch deine Körperposition als Anspielstation ausgeschaltet.',
+	},
+	{
+		term: 'Frei laufen',
+		correctAnswer:
+			'Sich vom Gegenspieler lösen und in einen freien Raum bewegen, um angespielt werden zu können.',
+		wrongAnswers: [
+			'Mit einem Lauf einen Gegenspieler wegziehen, damit ein Mitspieler den freien Raum nutzen kann.',
+			'Sich zwischen Ball und Gegenspieler stellen, um ein Zuspiel mit dem Körper abzuschirmen.',
+			'Nach einem Ballverlust in den Rücken eines Mitspielers laufen, um ihn abzusichern.',
+		],
+		explanation:
+			'Beim Freilaufen schaffst du Abstand zu deinem Gegenspieler und wirst dadurch zur Anspielstation.',
+	},
 ] satisfies FootballQuizQuestion[];
