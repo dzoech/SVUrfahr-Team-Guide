@@ -2,6 +2,7 @@ export type FootballQuizDifficulty = 'easy' | 'medium' | 'hard';
 
 export interface FootballQuizQuestion {
 	term: string;
+	prompt: 'Was ist' | 'Was bedeutet';
 	difficulty: FootballQuizDifficulty;
 	correctAnswer: string;
 	wrongAnswers: [string, string, string];
@@ -13,6 +14,7 @@ export const FOOTBALL_QUIZ_GAME_LENGTH = 11;
 export const FOOTBALL_QUIZ_QUESTIONS = [
 	{
 		term: 'hinter den Ball kommen',
+		prompt: 'Was bedeutet',
 		difficulty: 'medium',
 		correctAnswer: 'Nach einem Ballverlust schnell zurücklaufen und das eigene Tor schützen.',
 		wrongAnswers: [
@@ -25,6 +27,7 @@ export const FOOTBALL_QUIZ_QUESTIONS = [
 	},
 	{
 		term: 'in die Tiefe gehen',
+		prompt: 'Was bedeutet',
 		difficulty: 'medium',
 		correctAnswer: 'In den freien Raum hinter der gegnerischen Abwehr laufen.',
 		wrongAnswers: [
@@ -37,6 +40,7 @@ export const FOOTBALL_QUIZ_QUESTIONS = [
 	},
 	{
 		term: 'die zweite Stange',
+		prompt: 'Was ist',
 		difficulty: 'easy',
 		correctAnswer: 'Die Torstange, die weiter vom Ball entfernt ist.',
 		wrongAnswers: [
@@ -48,6 +52,7 @@ export const FOOTBALL_QUIZ_QUESTIONS = [
 	},
 	{
 		term: 'ballnah',
+		prompt: 'Was bedeutet',
 		difficulty: 'easy',
 		correctAnswer: 'Auf der Seite, auf der gerade der Ball ist.',
 		wrongAnswers: [
@@ -58,7 +63,8 @@ export const FOOTBALL_QUIZ_QUESTIONS = [
 		explanation: 'Ballnah bedeutet: nah beim Ball.',
 	},
 	{
-		term: 'das Passfenster',
+		term: 'ein Passfenster',
+		prompt: 'Was ist',
 		difficulty: 'medium',
 		correctAnswer: 'Eine freie Lücke, durch die du einen Pass spielen kannst.',
 		wrongAnswers: [
@@ -71,6 +77,7 @@ export const FOOTBALL_QUIZ_QUESTIONS = [
 	},
 	{
 		term: 'ballfern',
+		prompt: 'Was bedeutet',
 		difficulty: 'easy',
 		correctAnswer: 'Auf der Seite, die weiter vom Ball entfernt ist.',
 		wrongAnswers: [
@@ -82,6 +89,7 @@ export const FOOTBALL_QUIZ_QUESTIONS = [
 	},
 	{
 		term: 'das Feld breit machen',
+		prompt: 'Was bedeutet',
 		difficulty: 'medium',
 		correctAnswer: 'Sich im Angriff gut über die ganze Breite verteilen.',
 		wrongAnswers: [
@@ -94,6 +102,7 @@ export const FOOTBALL_QUIZ_QUESTIONS = [
 	},
 	{
 		term: 'zur Ballseite verschieben',
+		prompt: 'Was bedeutet',
 		difficulty: 'hard',
 		correctAnswer: 'Das ganze Team bewegt sich gemeinsam in Richtung Ball.',
 		wrongAnswers: [
@@ -105,7 +114,8 @@ export const FOOTBALL_QUIZ_QUESTIONS = [
 			'Beim Verschieben bewegt ihr euch gemeinsam zur Ballseite und bleibt nah zusammen.',
 	},
 	{
-		term: 'die Anspielstation',
+		term: 'eine Anspielstation',
+		prompt: 'Was ist',
 		difficulty: 'medium',
 		correctAnswer: 'Ein freier Mitspieler, dem du den Ball passen kannst.',
 		wrongAnswers: [
@@ -116,7 +126,8 @@ export const FOOTBALL_QUIZ_QUESTIONS = [
 		explanation: 'Eine Anspielstation zeigt sich frei und kann deinen Pass bekommen.',
 	},
 	{
-		term: 'der Spielaufbau',
+		term: 'Spielaufbau',
+		prompt: 'Was ist',
 		difficulty: 'medium',
 		correctAnswer: 'Den Ball vom eigenen Tor kontrolliert nach vorne spielen.',
 		wrongAnswers: [
@@ -128,7 +139,8 @@ export const FOOTBALL_QUIZ_QUESTIONS = [
 			'Beim Spielaufbau bringt ihr den Ball mit Pässen vom eigenen Tor nach vorne.',
 	},
 	{
-		term: 'das Pressing',
+		term: 'Pressing',
+		prompt: 'Was ist',
 		difficulty: 'medium',
 		correctAnswer: 'Den Gegner gemeinsam unter Druck setzen und den Ball jagen.',
 		wrongAnswers: [
@@ -141,6 +153,7 @@ export const FOOTBALL_QUIZ_QUESTIONS = [
 	},
 	{
 		term: 'die lange Ecke',
+		prompt: 'Was ist',
 		difficulty: 'medium',
 		correctAnswer: 'Die Seite des Tores, die weiter vom Schützen entfernt ist.',
 		wrongAnswers: [
@@ -151,14 +164,16 @@ export const FOOTBALL_QUIZ_QUESTIONS = [
 		explanation: 'Die lange Ecke ist vom Schützen weiter weg als die kurze Ecke.',
 	},
 	{
-		term: 'der Corner',
+		term: 'ein Corner',
+		prompt: 'Was ist',
 		difficulty: 'easy',
 		correctAnswer: 'Ein Eckball.',
 		wrongAnswers: ['Ein Einwurf.', 'Ein Abstoß.', 'Ein Freistoß.'],
 		explanation: 'Corner ist ein anderes Wort für Eckball.',
 	},
 	{
-		term: 'die Auftaktbewegung',
+		term: 'eine Auftaktbewegung',
+		prompt: 'Was ist',
 		difficulty: 'medium',
 		correctAnswer: 'Eine kurze Täuschung, bevor du in den freien Raum startest.',
 		wrongAnswers: [
@@ -170,7 +185,8 @@ export const FOOTBALL_QUIZ_QUESTIONS = [
 			'Du täuschst zuerst eine Richtung an und startest dann in die andere.',
 	},
 	{
-		term: 'die Finte',
+		term: 'eine Finte',
+		prompt: 'Was ist',
 		difficulty: 'easy',
 		correctAnswer: 'Eine Täuschung, mit der du am Gegner vorbeikommen willst.',
 		wrongAnswers: [
@@ -181,19 +197,22 @@ export const FOOTBALL_QUIZ_QUESTIONS = [
 		explanation: 'Bei einer Finte täuschst du etwas an und machst dann etwas anderes.',
 	},
 	{
-		term: 'die Abseitsfalle',
+		term: 'Abseits',
+		prompt: 'Was ist',
 		difficulty: 'hard',
-		correctAnswer: 'Die Abwehr läuft gemeinsam vor, damit ein Angreifer im Abseits steht.',
+		correctAnswer:
+			'In der gegnerischen Hälfte steht ein Angreifer beim Pass näher am Tor als Ball und vorletzter Gegner.',
 		wrongAnswers: [
-			'Ein Angreifer wartet unbemerkt hinter dem Torwart.',
-			'Der Torwart lässt den Ball ins Toraus rollen.',
-			'Die Abwehr stellt sich bei einem Eckball ins Tor.',
+			'Ein Angreifer steht beim Pass hinter dem Ball.',
+			'Ein Angreifer steht auf gleicher Höhe mit dem vorletzten Gegner.',
+			'Ein Angreifer bekommt den Ball direkt von einem Einwurf.',
 		],
 		explanation:
-			'Für die Abseitsfalle muss die ganze Abwehr im richtigen Moment vorrücken.',
+			'Abseits wird beim Pass geprüft und nur gepfiffen, wenn der Angreifer ins Spiel eingreift.',
 	},
 	{
-		term: 'das Gurkerl',
+		term: 'ein Gurkerl',
+		prompt: 'Was ist',
 		difficulty: 'easy',
 		correctAnswer: 'Den Ball durch die Beine eines Gegners spielen.',
 		wrongAnswers: [
@@ -205,7 +224,8 @@ export const FOOTBALL_QUIZ_QUESTIONS = [
 			'In Österreich heißt es Gurkerl, wenn der Ball durch die Beine des Gegners rollt.',
 	},
 	{
-		term: 'der Doppelpass',
+		term: 'ein Doppelpass',
+		prompt: 'Was ist',
 		difficulty: 'easy',
 		correctAnswer: 'Abspielen, weiterlaufen und den Ball sofort zurückbekommen.',
 		wrongAnswers: [
@@ -217,7 +237,8 @@ export const FOOTBALL_QUIZ_QUESTIONS = [
 			'Beim Doppelpass passt du zu einem Mitspieler und bekommst den Ball direkt zurück.',
 	},
 	{
-		term: 'die Schwalbe',
+		term: 'eine Schwalbe',
+		prompt: 'Was ist',
 		difficulty: 'easy',
 		correctAnswer: 'Ohne echtes Foul fallen und ein Foul vortäuschen.',
 		wrongAnswers: [
@@ -229,6 +250,7 @@ export const FOOTBALL_QUIZ_QUESTIONS = [
 	},
 	{
 		term: 'prallen lassen',
+		prompt: 'Was bedeutet',
 		difficulty: 'medium',
 		correctAnswer: 'Einen Pass mit einem Kontakt direkt weiterspielen.',
 		wrongAnswers: [
@@ -240,7 +262,8 @@ export const FOOTBALL_QUIZ_QUESTIONS = [
 			'Prallen lassen heißt auch klatschen lassen: Du spielst den Pass sofort weiter.',
 	},
 	{
-		term: 'der Lupfer',
+		term: 'ein Lupfer',
+		prompt: 'Was ist',
 		difficulty: 'easy',
 		correctAnswer: 'Den Ball in einem hohen Bogen über einen Gegner spielen.',
 		wrongAnswers: [
@@ -253,6 +276,7 @@ export const FOOTBALL_QUIZ_QUESTIONS = [
 	},
 	{
 		term: 'der Strafraum',
+		prompt: 'Was ist',
 		difficulty: 'easy',
 		correctAnswer: 'Der Bereich vor dem Tor, in dem der Torwart die Hände benutzen darf.',
 		wrongAnswers: [
@@ -264,7 +288,8 @@ export const FOOTBALL_QUIZ_QUESTIONS = [
 			'Foult die Abwehr im eigenen Strafraum, kann es einen Elfmeter geben.',
 	},
 	{
-		term: 'die Mauer',
+		term: 'eine Mauer',
+		prompt: 'Was ist',
 		difficulty: 'easy',
 		correctAnswer: 'Mehrere Spieler stehen bei einem Freistoß nebeneinander.',
 		wrongAnswers: [
@@ -276,6 +301,7 @@ export const FOOTBALL_QUIZ_QUESTIONS = [
 	},
 	{
 		term: 'die Latte',
+		prompt: 'Was ist',
 		difficulty: 'easy',
 		correctAnswer: 'Die waagrechte Stange oben am Tor.',
 		wrongAnswers: [
@@ -286,7 +312,8 @@ export const FOOTBALL_QUIZ_QUESTIONS = [
 		explanation: 'Die Latte liegt oben auf den beiden Torpfosten.',
 	},
 	{
-		term: 'der Übersteiger',
+		term: 'ein Übersteiger',
+		prompt: 'Was ist',
 		difficulty: 'medium',
 		correctAnswer: 'Mit dem Fuß um den Ball kreisen und eine Richtung antäuschen.',
 		wrongAnswers: [
@@ -298,7 +325,8 @@ export const FOOTBALL_QUIZ_QUESTIONS = [
 			'Der Übersteiger ist eine Finte, bevor du in eine andere Richtung dribbelst.',
 	},
 	{
-		term: 'die Flanke',
+		term: 'eine Flanke',
+		prompt: 'Was ist',
 		difficulty: 'easy',
 		correctAnswer: 'Den Ball von der Seite vor das gegnerische Tor spielen.',
 		wrongAnswers: [
@@ -310,6 +338,7 @@ export const FOOTBALL_QUIZ_QUESTIONS = [
 	},
 	{
 		term: 'den Gegner doppeln',
+		prompt: 'Was bedeutet',
 		difficulty: 'medium',
 		correctAnswer: 'Zu zweit gegen den Spieler mit Ball verteidigen.',
 		wrongAnswers: [
@@ -321,7 +350,8 @@ export const FOOTBALL_QUIZ_QUESTIONS = [
 			'Beim Doppeln greift ein Spieler an und ein zweiter hilft ihm dabei.',
 	},
 	{
-		term: 'der Konter',
+		term: 'ein Konter',
+		prompt: 'Was ist',
 		difficulty: 'easy',
 		correctAnswer: 'Nach einem Ballgewinn sofort schnell angreifen.',
 		wrongAnswers: [
@@ -333,7 +363,8 @@ export const FOOTBALL_QUIZ_QUESTIONS = [
 			'Beim Konter nutzt ihr schnell den freien Raum, bevor der Gegner zurück ist.',
 	},
 	{
-		term: 'der Abschluss',
+		term: 'ein Abschluss',
+		prompt: 'Was ist',
 		difficulty: 'easy',
 		correctAnswer: 'Die letzte Aktion eines Angriffs, meistens ein Torschuss.',
 		wrongAnswers: [
@@ -345,6 +376,7 @@ export const FOOTBALL_QUIZ_QUESTIONS = [
 	},
 	{
 		term: 'kompakt stehen',
+		prompt: 'Was bedeutet',
 		difficulty: 'hard',
 		correctAnswer: 'Als Team mit kleinen Abständen verteidigen.',
 		wrongAnswers: [
@@ -356,7 +388,8 @@ export const FOOTBALL_QUIZ_QUESTIONS = [
 			'Mit kleinen Abständen lasst ihr dem Gegner wenig Platz zwischen euch.',
 	},
 	{
-		term: 'die Standardsituation',
+		term: 'eine Standardsituation',
+		prompt: 'Was ist',
 		difficulty: 'hard',
 		correctAnswer: 'Eine Spielfortsetzung wie Freistoß, Eckball oder Einwurf.',
 		wrongAnswers: [
@@ -369,6 +402,7 @@ export const FOOTBALL_QUIZ_QUESTIONS = [
 	},
 	{
 		term: 'hoch verteidigen',
+		prompt: 'Was bedeutet',
 		difficulty: 'hard',
 		correctAnswer: 'Weit vor dem eigenen Tor stehen und den Gegner früh stören.',
 		wrongAnswers: [
@@ -381,6 +415,7 @@ export const FOOTBALL_QUIZ_QUESTIONS = [
 	},
 	{
 		term: 'tief verteidigen',
+		prompt: 'Was bedeutet',
 		difficulty: 'hard',
 		correctAnswer: 'Nah am eigenen Tor stehen und den Raum dahinter schützen.',
 		wrongAnswers: [
@@ -392,7 +427,8 @@ export const FOOTBALL_QUIZ_QUESTIONS = [
 			'Beim tiefen Verteidigen zieht ihr euch näher zum eigenen Tor zurück.',
 	},
 	{
-		term: 'der Stanglpass',
+		term: 'ein Stanglpass',
+		prompt: 'Was ist',
 		difficulty: 'hard',
 		correctAnswer: 'Ein flacher, scharfer Pass quer vor dem Tor.',
 		wrongAnswers: [
@@ -405,6 +441,7 @@ export const FOOTBALL_QUIZ_QUESTIONS = [
 	},
 	{
 		term: 'der Deckungsschatten',
+		prompt: 'Was ist',
 		difficulty: 'hard',
 		correctAnswer: 'Du läufst den Spieler so an, dass dein Körper einen Passweg versperrt.',
 		wrongAnswers: [
@@ -417,6 +454,7 @@ export const FOOTBALL_QUIZ_QUESTIONS = [
 	},
 	{
 		term: 'sich freilaufen',
+		prompt: 'Was bedeutet',
 		difficulty: 'hard',
 		correctAnswer: 'Sich vom Gegner lösen und in einen freien Raum laufen.',
 		wrongAnswers: [
