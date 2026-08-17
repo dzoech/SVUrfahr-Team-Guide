@@ -1,6 +1,6 @@
 ---
-title: Mannschaftskalender abonnieren
+title: WhatsApp-Gruppe beitreten
 order: 5
 ---
 
-Den Kalender am Mobiltelefon abonnieren, damit neue und geänderte Termine automatisch erscheinen.
+Nach deinem Start wirst du und deine Eltern in die **WhatsApp-Gruppe der Mannschaft** aufgenommen. Dort findest du alle wichtigen Ankündigungen und Termine.
