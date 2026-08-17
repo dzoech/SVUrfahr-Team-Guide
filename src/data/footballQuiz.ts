@@ -2,7 +2,11 @@ export type FootballQuizDifficulty = 'easy' | 'medium' | 'hard';
 
 export interface FootballQuizQuestion {
 	term: string;
-	prompt: 'Was ist' | 'Was bedeutet' | 'Beim Verteidigen, was bedeutet';
+	prompt:
+		| 'Was ist'
+		| 'Was bedeutet'
+		| 'Beim Verteidigen, was bedeutet'
+		| 'Beim Angreifen, was ist';
 	difficulty: FootballQuizDifficulty;
 	correctAnswer: string;
 	wrongAnswers: [string, string, string];
@@ -363,7 +367,7 @@ export const FOOTBALL_QUIZ_QUESTIONS = [
 	},
 	{
 		term: 'ein Abschluss',
-		prompt: 'Was ist',
+		prompt: 'Beim Angreifen, was ist',
 		difficulty: 'easy',
 		correctAnswer: 'Die letzte Aktion eines Angriffs, meistens ein Torschuss.',
 		wrongAnswers: [

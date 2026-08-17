@@ -69,7 +69,11 @@ const gameLength = FOOTBALL_QUIZ_GAME_LENGTH;
 <script>
 	interface QuizQuestion {
 		term: string;
-		prompt: 'Was ist' | 'Was bedeutet' | 'Beim Verteidigen, was bedeutet';
+		prompt:
+			| 'Was ist'
+			| 'Was bedeutet'
+			| 'Beim Verteidigen, was bedeutet'
+			| 'Beim Angreifen, was ist';
 		difficulty: 'easy' | 'medium' | 'hard';
 		correctAnswer: string;
 		wrongAnswers: string[];
@@ -103,7 +107,7 @@ const gameLength = FOOTBALL_QUIZ_GAME_LENGTH;
 		hard: 2,
 	} satisfies Record<QuizQuestion['difficulty'], number>;
 	const ANSWER_LETTERS = ['A', 'B', 'C', 'D'];
-	const PROGRESS_STORAGE_KEY = 'svurfahr-football-quiz-progress-v3';
+	const PROGRESS_STORAGE_KEY = 'svurfahr-football-quiz-progress-v4';
 
 	function requireQuizElement<T extends Element>(element: T | null, selector: string): T {
 		if (!element) {
@@ -122,7 +126,8 @@ const gameLength = FOOTBALL_QUIZ_GAME_LENGTH;
 			typeof question.term === 'string' &&
 			(question.prompt === 'Was ist' ||
 				question.prompt === 'Was bedeutet' ||
-				question.prompt === 'Beim Verteidigen, was bedeutet') &&
+				question.prompt === 'Beim Verteidigen, was bedeutet' ||
+				question.prompt === 'Beim Angreifen, was ist') &&
 			(question.difficulty === 'easy' ||
 				question.difficulty === 'medium' ||
 				question.difficulty === 'hard') &&
