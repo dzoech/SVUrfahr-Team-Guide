@@ -6,10 +6,7 @@ export const CALENDAR_URL =
 
 export const CALENDAR_SUBSCRIPTION_URL = CALENDAR_URL.replace(/^https:/, 'webcal:');
 
-const HIDDEN_EVENT_OCCURRENCES = new Set([
-	'4165292|2026-09-04T16:15:00.000Z',
-	'4165298|2026-09-11T16:15:00.000Z',
-]);
+const HIDDEN_EVENT_IDS = new Set(['4165292']);
 
 export interface CalendarEvent {
 	id: string;
@@ -71,7 +68,7 @@ async function loadUpcomingEvents(): Promise<CalendarEvent[]> {
 
 	return Object.values(parsed)
 		.filter(isEvent)
-		.filter((event) => !HIDDEN_EVENT_OCCURRENCES.has(`${event.uid}|${event.start.toISOString()}`))
+		.filter((event) => !HIDDEN_EVENT_IDS.has(event.uid))
 		.filter((event) => {
 			if (event.status === 'CANCELLED') {
 				return false;
@@ -95,7 +92,9 @@ async function loadUpcomingEvents(): Promise<CalendarEvent[]> {
 		}));
 }
 
-export async function getUpcomingEvents(limit = 6): Promise<CalendarEvent[]> {
+export async function getUpcomingEvents(limit?: number): Promise<CalendarEvent[]> {
 	upcomingEventsPromise ??= loadUpcomingEvents();
-	return (await upcomingEventsPromise).slice(0, limit);
+	const events = await upcomingEventsPromise;
+
+	return limit === undefined ? events : events.slice(0, limit);
 }
