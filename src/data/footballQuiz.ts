@@ -2,7 +2,7 @@ export type FootballQuizDifficulty = 'easy' | 'medium' | 'hard';
 
 export interface FootballQuizQuestion {
 	term: string;
-	prompt: 'Was ist' | 'Was bedeutet';
+	prompt: 'Was ist' | 'Was bedeutet' | 'Beim Verteidigen, was bedeutet';
 	difficulty: FootballQuizDifficulty;
 	correctAnswer: string;
 	wrongAnswers: [string, string, string];
@@ -14,7 +14,7 @@ export const FOOTBALL_QUIZ_GAME_LENGTH = 11;
 export const FOOTBALL_QUIZ_QUESTIONS = [
 	{
 		term: 'hinter den Ball kommen',
-		prompt: 'Was bedeutet',
+		prompt: 'Beim Verteidigen, was bedeutet',
 		difficulty: 'medium',
 		correctAnswer: 'Nach einem Ballverlust schnell zurücklaufen und das eigene Tor schützen.',
 		wrongAnswers: [
@@ -197,18 +197,17 @@ export const FOOTBALL_QUIZ_QUESTIONS = [
 		explanation: 'Bei einer Finte täuschst du etwas an und machst dann etwas anderes.',
 	},
 	{
-		term: 'Abseits',
+		term: 'eine Abseitsfalle',
 		prompt: 'Was ist',
 		difficulty: 'hard',
-		correctAnswer:
-			'In der gegnerischen Hälfte steht ein Angreifer beim Pass näher am Tor als Ball und vorletzter Gegner.',
+		correctAnswer: 'Die Abwehr läuft gemeinsam vor, damit ein Angreifer im Abseits steht.',
 		wrongAnswers: [
-			'Ein Angreifer steht beim Pass hinter dem Ball.',
-			'Ein Angreifer steht auf gleicher Höhe mit dem vorletzten Gegner.',
-			'Ein Angreifer bekommt den Ball direkt von einem Einwurf.',
+			'Ein Angreifer wartet unbemerkt hinter dem Torwart.',
+			'Der Torwart lässt den Ball ins Toraus rollen.',
+			'Die Abwehr stellt sich bei einem Eckball ins Tor.',
 		],
 		explanation:
-			'Abseits wird beim Pass geprüft und nur gepfiffen, wenn der Angreifer ins Spiel eingreift.',
+			'Für die Abseitsfalle muss die ganze Abwehr im richtigen Moment vorrücken.',
 	},
 	{
 		term: 'ein Gurkerl',
