@@ -394,15 +394,22 @@ const gameLength = FOOTBALL_QUIZ_GAME_LENGTH;
 					return;
 				}
 
-				const currentWidth = window.getComputedStyle(button, '::before').width;
+				const parsedWidth = Number.parseFloat(
+					window.getComputedStyle(button, '::before').width,
+				);
+				const currentWidth = Number.isFinite(parsedWidth) ? parsedWidth : 0;
+				// Even the fastest tap should visibly fill at least a third of the button, so
+				// the hint is noticeable rather than a barely-visible sliver.
+				const minFillWidth = button.offsetWidth / 3;
+				const frozenWidth = Math.max(currentWidth, minFillWidth);
 
 				cancelHold();
 				clearRelease(button);
 
-				button.style.setProperty('--fill-width', currentWidth);
+				button.style.setProperty('--fill-width', `${frozenWidth}px`);
 				button.classList.add('releasing');
 
-				// Force a reflow so the transition below animates from currentWidth down to 0.
+				// Force a reflow so the transition below animates from frozenWidth down to 0.
 				void button.offsetWidth;
 
 				button.style.setProperty('--fill-width', '0');
