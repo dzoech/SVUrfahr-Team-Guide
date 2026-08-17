@@ -1,9 +1,9 @@
 ---
 title: Trainingsset bei machsport bestellen
-order: 3
+order: 8
 ---
 
-Bestelle dir das Trainingsset bei unserem Ausrüster **machsport**.
+Bestelle dir das Trainingsset bei unserem Ausrüster machsport.
 
 <div class="starter-pack-images">
 	<a href="https://mach-sport.com/collections/sv-urfahr-1912/products/sv-urfahr-1912-trainingsset-kurz-rot">
