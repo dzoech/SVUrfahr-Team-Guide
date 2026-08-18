@@ -15,6 +15,7 @@ const faq = defineCollection({
 	schema: z.object({
 		question: z.string(),
 		order: z.number().int().nonnegative(),
+		section: z.string().optional(),
 	}),
 });
 

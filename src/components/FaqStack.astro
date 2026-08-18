@@ -10,6 +10,20 @@ const questions = await Promise.all(
 		Content: (await render(entry)).Content,
 	})),
 );
+const sections = questions.reduce<
+	Array<{ title?: string; questions: typeof questions }>
+>((groups, question) => {
+	const title = question.entry.data.section;
+	const currentGroup = groups.at(-1);
+
+	if (currentGroup && currentGroup.title === title) {
+		currentGroup.questions.push(question);
+	} else {
+		groups.push({ title, questions: [question] });
+	}
+
+	return groups;
+}, []);
 ---
 
 <section class="card-stack">
@@ -18,16 +32,21 @@ const questions = await Promise.all(
 	<h2>Häufige Fragen</h2>
 
 	<div class="questions">
-		{questions.map(({ entry, Content }) => (
-			<details id={entry.id}>
-				<summary>
-					<span>{entry.data.question}</span>
-					<span class="plus" aria-hidden="true"></span>
-				</summary>
-				<div class="answer">
-					<Content />
-				</div>
-			</details>
+		{sections.map((section) => (
+			<section class="question-group">
+				{section.title && <h3>{section.title}</h3>}
+				{section.questions.map(({ entry, Content }) => (
+					<details id={entry.id}>
+						<summary>
+							<span>{entry.data.question}</span>
+							<span class="plus" aria-hidden="true"></span>
+						</summary>
+						<div class="answer">
+							<Content />
+						</div>
+					</details>
+				))}
+			</section>
 		))}
 	</div>
 </section>
@@ -96,7 +115,19 @@ const questions = await Promise.all(
 
 	.questions {
 		display: grid;
+		gap: 1rem;
+	}
+
+	.question-group {
+		display: grid;
 		gap: 0.55rem;
+	}
+
+	h3 {
+		margin: 0.25rem 0 0;
+		color: var(--accent-dark);
+		font-family: ui-rounded, "Arial Rounded MT Bold", sans-serif;
+		font-size: 1.15rem;
 	}
 
 	details {
