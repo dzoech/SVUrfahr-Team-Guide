@@ -130,6 +130,30 @@ const timeFormatter = new Intl.DateTimeFormat('de-AT', {
 			<div>Was brauchst du gerade?</div>
 		</header>
 
+		<section class="season-updates" aria-labelledby="season-updates-title">
+			<div class="updates-masthead" aria-hidden="true">
+				<span>SV Urfahr 1912</span>
+				<strong>Mannschaftsblatt</strong>
+				<span>Sonderausgabe</span>
+			</div>
+			<p class="updates-label">Neu in dieser Saison</p>
+			<h2 id="season-updates-title">Das ändert sich in der Organisation</h2>
+			<ul>
+				<li>
+					<strong>Auswärtsfahrten:</strong> Eltern organisieren Anreise und Fahrgemeinschaften selbst.
+					<a href={`${pagePath('aufgaben-eltern')}#01-puenktlichkeit`}>Mehr dazu →</a>
+				</li>
+				<li>
+					<strong>Neue Absagefrist:</strong> Trainingsabsagen jetzt 24 Stunden vorher statt 1 Stunde.
+					<a href={`${pagePath('faq')}#02-absage`}>Mehr dazu →</a>
+				</li>
+				<li>
+					<strong>Mehr Eigenverantwortung:</strong> Bei kurzfristigen Absagen ruft das Kind selbst an.
+					<a href={`${pagePath('faq')}#02-absage`}>Fristen ansehen →</a>
+				</li>
+			</ul>
+		</section>
+
 		<nav class="desk-menu" aria-label="Bereiche der Mannschaftsmappe">
 			<a class="menu-card calendar-card" href={pagePath('termine')} style="--order: 0">
 				<span class="card-label">Nächstes Match</span>
@@ -697,6 +721,145 @@ const timeFormatter = new Intl.DateTimeFormat('de-AT', {
 		margin-top: 0.5rem;
 		color: rgb(255 255 255 / 70%);
 		font-size: 0.92rem;
+	}
+
+	.season-updates {
+		position: relative;
+		z-index: 2;
+		padding: 0.7rem 0.8rem 0.9rem;
+		border: 1px solid #4b463d;
+		border-radius: 0.08rem;
+		color: var(--ink);
+		background:
+			radial-gradient(circle at 18% 22%, rgb(77 59 34 / 5%) 0 0.05rem, transparent 0.08rem),
+			radial-gradient(circle at 76% 68%, rgb(77 59 34 / 4%) 0 0.04rem, transparent 0.07rem),
+			linear-gradient(96deg, transparent 48%, rgb(65 54 38 / 4%) 50%, transparent 52%),
+			#f4edd9;
+		background-size: 1.2rem 1.2rem, 1.6rem 1.6rem, 100% 100%, auto;
+		box-shadow:
+			0 0 0 0.22rem #f4edd9,
+			0 0 0 0.29rem #4b463d,
+			var(--shadow);
+		transform: rotate(-0.2deg);
+		animation: desk-drop 430ms cubic-bezier(0.2, 0.8, 0.25, 1) 55ms both;
+	}
+
+	.updates-masthead {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+		gap: 0.45rem;
+		padding: 0.3rem 0;
+		align-items: center;
+		border-top: 0.16rem solid #292621;
+		border-bottom: 0.16rem solid #292621;
+		font-family: Georgia, "Times New Roman", serif;
+		text-transform: uppercase;
+	}
+
+	.updates-masthead span {
+		font-size: 0.48rem;
+		font-weight: 700;
+		letter-spacing: 0.08em;
+		line-height: 1.1;
+		text-align: center;
+	}
+
+	.updates-masthead strong {
+		font-size: 0.95rem;
+		line-height: 1;
+		letter-spacing: -0.03em;
+	}
+
+	.updates-label {
+		width: fit-content;
+		padding: 0.12rem 0.38rem;
+		margin: 0.65rem auto 0.28rem;
+		color: #f4edd9;
+		background: var(--accent-dark);
+		font-family: Georgia, "Times New Roman", serif;
+		font-size: 0.62rem;
+		font-weight: 700;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+	}
+
+	.season-updates h2 {
+		max-width: 20rem;
+		margin: 0 auto;
+		font-family: Georgia, "Times New Roman", serif;
+		font-size: clamp(1.45rem, 7vw, 1.8rem);
+		font-weight: 900;
+		line-height: 0.98;
+		letter-spacing: -0.045em;
+		text-align: center;
+	}
+
+	.season-updates ul {
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		padding: 0.65rem 0 0;
+		margin: 0.75rem 0 0;
+		border-top: 0.18rem double #696156;
+		list-style: none;
+	}
+
+	.season-updates li {
+		padding: 0 0.55rem;
+		border-right: 1px solid #9f9685;
+		color: #37332d;
+		font-family: Georgia, "Times New Roman", serif;
+		font-size: 0.7rem;
+		line-height: 1.35;
+	}
+
+	.season-updates li:first-child {
+		padding-left: 0;
+	}
+
+	.season-updates li:last-child {
+		padding-right: 0;
+		border-right: 0;
+	}
+
+	.season-updates strong {
+		display: block;
+		margin-bottom: 0.12rem;
+		color: var(--ink);
+		font-size: 0.72rem;
+		line-height: 1.2;
+	}
+
+	.season-updates li a {
+		display: inline-block;
+		margin-top: 0.25rem;
+		color: var(--accent-dark);
+		font-family: system-ui, sans-serif;
+		font-size: 0.62rem;
+		font-weight: 850;
+		white-space: nowrap;
+	}
+
+	@media (max-width: 22rem) {
+		.season-updates ul {
+			grid-template-columns: 1fr;
+		}
+
+		.season-updates li,
+		.season-updates li:first-child,
+		.season-updates li:last-child {
+			padding: 0.5rem 0;
+			border-right: 0;
+			border-bottom: 1px solid #9f9685;
+		}
+
+		.season-updates li:first-child {
+			padding-top: 0;
+		}
+
+		.season-updates li:last-child {
+			padding-bottom: 0;
+			border-bottom: 0;
+		}
 	}
 
 	.team-scarf {
