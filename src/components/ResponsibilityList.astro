@@ -41,7 +41,7 @@ const items = await Promise.all(
 	<div class="folder-page">
 		<ol>
 			{items.map(({ entry, Content }, index) => (
-				<li>
+				<li id={entry.id}>
 					<span class="number" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
 					<div class="copy">
 						<h2>{entry.data.title}</h2>
@@ -123,6 +123,7 @@ const items = await Promise.all(
 		grid-template-columns: 2.2rem minmax(0, 1fr);
 		gap: 0.7rem;
 		padding: 0.85rem 0;
+		scroll-margin-top: 5.5rem;
 		border-bottom: 1px dashed #c9beaa;
 	}
 
