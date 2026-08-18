@@ -7,11 +7,13 @@ export const CALENDAR_URL =
 export const CALENDAR_SUBSCRIPTION_URL = CALENDAR_URL.replace(/^https:/, 'webcal:');
 
 const HIDDEN_EVENT_IDS = new Set(['4165292']);
+const CALENDAR_TEAM_NAME = 'Urfahr U11';
 
 export interface CalendarEvent {
 	id: string;
 	title: string;
-	description: string;
+	matchSide?: 'home' | 'away';
+	opponent?: string;
 	location: string;
 	start: Date;
 	end?: Date;
@@ -39,6 +41,19 @@ function repairMojibake(value: string): string {
 
 	const repaired = Buffer.from(value, 'latin1').toString('utf8');
 	return repaired.includes('\uFFFD') ? value : repaired;
+}
+
+function formatMatch(value: string): Pick<CalendarEvent, 'title' | 'matchSide' | 'opponent'> {
+	const [homeTeam, awayTeam] = value.split(/\s+:\s+/, 2);
+
+	if (homeTeam === CALENDAR_TEAM_NAME && awayTeam) {
+		return { title: `Heimspiel vs ${awayTeam}`, matchSide: 'home', opponent: awayTeam };
+	}
+	if (awayTeam === CALENDAR_TEAM_NAME && homeTeam) {
+		return { title: `Auswärtsspiel vs ${homeTeam}`, matchSide: 'away', opponent: homeTeam };
+	}
+
+	return { title: value };
 }
 
 function dateKeyInVienna(date: Date): string {
@@ -81,15 +96,18 @@ async function loadUpcomingEvents(): Promise<CalendarEvent[]> {
 			return effectiveEnd >= now.getTime();
 		})
 		.sort((left, right) => left.start.getTime() - right.start.getTime())
-		.map((event) => ({
-			id: event.uid,
-			title: repairMojibake(unwrap(event.summary)),
-			description: repairMojibake(unwrap(event.description)),
-			location: repairMojibake(unwrap(event.location)),
-			start: event.start,
-			end: event.end,
-			allDay: event.start.dateOnly === true,
-		}));
+		.map((event) => {
+			const match = formatMatch(repairMojibake(unwrap(event.summary)));
+
+			return {
+				id: event.uid,
+				...match,
+				location: repairMojibake(unwrap(event.location)),
+				start: event.start,
+				end: event.end,
+				allDay: event.start.dateOnly === true,
+			};
+		});
 }
 
 export async function getUpcomingEvents(limit?: number): Promise<CalendarEvent[]> {
