@@ -9,6 +9,7 @@ import { getUpcomingEvents } from '../lib/calendar';
 import BaseLayout from '../layouts/BaseLayout.astro';
 
 const [nextEvent] = await getUpcomingEvents(1);
+const nextOpponent = nextEvent?.opponent?.replace(/\s+U11(?:\s+[AB])?$/, '');
 const showKontaktCard = false;
 const timeZone = 'Europe/Vienna';
 const dateFormatter = new Intl.DateTimeFormat('de-AT', {
@@ -148,23 +149,22 @@ const timeFormatter = new Intl.DateTimeFormat('de-AT', {
 						<span
 							class:list={[
 								'card-title',
-								{ 'card-fixture': nextEvent.matchSide && nextEvent.opponent },
+								{ 'card-fixture': nextEvent.matchSide && nextOpponent },
 							]}
 						>
-							{nextEvent.matchSide && nextEvent.opponent ? (
+							{nextEvent.matchSide && nextOpponent ? (
 								<>
 									{nextEvent.matchSide === 'home' && (
 										<Image class="card-fixture-badge" src={clubLogo} alt="SV Urfahr" />
 									)}
 									<span>
 										{nextEvent.matchSide === 'home'
-											? `vs ${nextEvent.opponent}`
-											: `${nextEvent.opponent} vs`}
+											? `vs ${nextOpponent}`
+											: `${nextOpponent} vs`}
 									</span>
 									{nextEvent.matchSide === 'away' && (
 										<Image class="card-fixture-badge" src={clubLogo} alt="SV Urfahr" />
 									)}
-									<small>({nextEvent.matchSide === 'home' ? 'Heim' : 'Auswärts'})</small>
 								</>
 							) : (
 								nextEvent.title
@@ -940,11 +940,6 @@ const timeFormatter = new Intl.DateTimeFormat('de-AT', {
 		width: auto;
 		height: 2rem;
 		object-fit: contain;
-	}
-
-	.card-fixture small {
-		color: var(--muted);
-		font-size: 0.75rem;
 	}
 
 	.card-action {
