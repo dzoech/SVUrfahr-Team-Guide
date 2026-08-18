@@ -138,7 +138,31 @@ const timeFormatter = new Intl.DateTimeFormat('de-AT', {
 							<strong>{dateFormatter.format(nextEvent.start)}</strong>
 							<small>{nextEvent.allDay ? 'Ganztägig' : timeFormatter.format(nextEvent.start)}</small>
 						</span>
-						<span class="card-title">{nextEvent.title}</span>
+						<span
+							class:list={[
+								'card-title',
+								{ 'card-fixture': nextEvent.matchSide && nextEvent.opponent },
+							]}
+						>
+							{nextEvent.matchSide && nextEvent.opponent ? (
+								<>
+									{nextEvent.matchSide === 'home' && (
+										<Image class="card-fixture-badge" src={clubLogo} alt="SV Urfahr" />
+									)}
+									<span>
+										{nextEvent.matchSide === 'home'
+											? `vs ${nextEvent.opponent}`
+											: `${nextEvent.opponent} vs`}
+									</span>
+									{nextEvent.matchSide === 'away' && (
+										<Image class="card-fixture-badge" src={clubLogo} alt="SV Urfahr" />
+									)}
+									<small>({nextEvent.matchSide === 'home' ? 'Heim' : 'Auswärts'})</small>
+								</>
+							) : (
+								nextEvent.title
+							)}
+						</span>
 					</>
 				) : (
 					<span class="card-title">Meisterschaftskalender öffnen</span>
@@ -881,6 +905,23 @@ const timeFormatter = new Intl.DateTimeFormat('de-AT', {
 	.calendar-card .card-title {
 		padding-left: 0.8rem;
 		font-size: 1.12rem;
+	}
+
+	.calendar-card .card-fixture {
+		display: flex;
+		align-items: center;
+		gap: 0.35rem;
+	}
+
+	.card-fixture-badge {
+		width: auto;
+		height: 2rem;
+		object-fit: contain;
+	}
+
+	.card-fixture small {
+		color: var(--muted);
+		font-size: 0.75rem;
 	}
 
 	.card-action {
