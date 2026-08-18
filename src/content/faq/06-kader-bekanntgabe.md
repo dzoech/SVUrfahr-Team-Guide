@@ -4,4 +4,4 @@ order: 6
 section: Spieltags-FAQ
 ---
 
-Der Kader wird so früh wie möglich bekannt gegeben, idealerweise einige Tage vor dem Spiel. Das ist jedoch nicht immer möglich.
+Der Kader wird so früh wie möglich bekannt gegeben, idealerweise einige Tage vor dem Spiel. Aus unterschiedlichen Gründen ist das jedoch nicht immer möglich. Wir bitten dafür um Verständnis.
