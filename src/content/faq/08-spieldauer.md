@@ -4,4 +4,4 @@ order: 8
 section: Spieltags-FAQ
 ---
 
-Wir spielen **dreimal 20 Minuten**.
+Wir spielen **dreimal 20 Minuten** mit jeweils **5 Minuten Pause** dazwischen.
