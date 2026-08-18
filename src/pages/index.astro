@@ -133,13 +133,6 @@ const timeFormatter = new Intl.DateTimeFormat('de-AT', {
 		<nav class="desk-menu" aria-label="Bereiche der Mannschaftsmappe">
 			<a class="menu-card calendar-card" href={pagePath('termine')} style="--order: 0">
 				<span class="card-label">Nächstes Match</span>
-				<span class="calendar-whistle" aria-hidden="true">
-					<svg viewBox="0 0 64 40">
-						<path d="M17 7h20a15 15 0 1 1 0 30H21A16 16 0 0 1 17 7Zm20 9a6 6 0 1 0 0 12 6 6 0 0 0 0-12Z" />
-						<path d="M18 7 3 11v9h15Z" />
-						<circle cx="18" cy="4" r="3" />
-					</svg>
-				</span>
 				{nextEvent ? (
 					<>
 						<span class="calendar-date">
@@ -877,22 +870,6 @@ const timeFormatter = new Intl.DateTimeFormat('de-AT', {
 		font-weight: 950;
 		letter-spacing: 0.09em;
 		text-transform: uppercase;
-	}
-
-	.calendar-whistle {
-		position: absolute;
-		top: 0.55rem;
-		right: 0.9rem;
-		width: 2.55rem;
-		color: var(--accent);
-		filter: drop-shadow(0.08rem 0.1rem 0 rgb(0 0 0 / 16%));
-		transform: rotate(-12deg);
-	}
-
-	.calendar-whistle svg {
-		display: block;
-		width: 100%;
-		fill: currentColor;
 	}
 
 	.calendar-date {
