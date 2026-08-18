@@ -230,22 +230,22 @@ const timeFormatter = new Intl.DateTimeFormat('de-AT', {
 				<span class="card-action">Nachlesen →</span>
 			</a>
 
-			<a class="menu-card formation-card" href={pagePath('aufstellung')} style="--order: 5">
+			<a class="menu-card index-card" href={pagePath('faq')} style="--order: 5">
+				<span class="object-mark" aria-hidden="true">?</span>
+				<span class="card-title">Häufige Fragen</span>
+				<span class="card-action">Antworten →</span>
+			</a>
+
+			<a class="menu-card formation-card" href={pagePath('aufstellung')} style="--order: 6">
 				<span class="object-mark formation-mark" aria-hidden="true">6+1</span>
 				<span class="card-title">Positionen am Feld</span>
 				<span class="card-action">Taktiktafel öffnen →</span>
 			</a>
 
-			<a class="menu-card quiz-link-card" href={pagePath('fussballbegriffe')} style="--order: 6">
+			<a class="menu-card quiz-link-card" href={pagePath('fussballbegriffe')} style="--order: 7">
 				<span class="object-mark quiz-mark" aria-hidden="true">ABC</span>
 				<span class="card-title">Fußballbegriffe-Quiz</span>
 				<span class="card-action">Quiz starten →</span>
-			</a>
-
-			<a class="menu-card index-card" href={pagePath('faq')} style="--order: 7">
-				<span class="object-mark" aria-hidden="true">?</span>
-				<span class="card-title">Häufige Fragen</span>
-				<span class="card-action">Antworten →</span>
 			</a>
 
 			{showKontaktCard && (
@@ -831,6 +831,7 @@ const timeFormatter = new Intl.DateTimeFormat('de-AT', {
 
 	.season-updates li a {
 		display: inline-block;
+		padding-left: 0.25rem;
 		margin-top: 0.25rem;
 		color: var(--accent-dark);
 		font-family: system-ui, sans-serif;
@@ -1180,6 +1181,7 @@ const timeFormatter = new Intl.DateTimeFormat('de-AT', {
 	}
 
 	.practice-rsvp a {
+		padding-left: 0.25rem;
 		font-weight: 850;
 		white-space: nowrap;
 	}
