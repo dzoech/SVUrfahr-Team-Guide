@@ -9,6 +9,7 @@ import { getUpcomingEvents } from '../lib/calendar';
 import BaseLayout from '../layouts/BaseLayout.astro';
 
 const [nextEvent] = await getUpcomingEvents(1);
+const showKontaktCard = false;
 const timeZone = 'Europe/Vienna';
 const dateFormatter = new Intl.DateTimeFormat('de-AT', {
 	weekday: 'short',
@@ -199,11 +200,13 @@ const timeFormatter = new Intl.DateTimeFormat('de-AT', {
 				<span class="card-action">Antworten →</span>
 			</a>
 
-			<a class="menu-card note-card" href={pagePath('kontakt')} style="--order: 8">
-				<span class="object-mark" aria-hidden="true">i</span>
-				<span class="card-title">Kontakt</span>
-				<span class="card-action">Öffnen →</span>
-			</a>
+			{showKontaktCard && (
+				<a class="menu-card note-card" href={pagePath('kontakt')} style="--order: 8">
+					<span class="object-mark" aria-hidden="true">i</span>
+					<span class="card-title">Kontakt</span>
+					<span class="card-action">Öffnen →</span>
+				</a>
+			)}
 
 			<a class="menu-card newcomer-card" href={pagePath('neu-im-team')} style="--order: 9">
 				<span class="object-mark" aria-hidden="true">★</span>
